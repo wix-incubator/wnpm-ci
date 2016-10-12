@@ -1,0 +1,43 @@
+{
+  "name": "wnpm-ci",
+  "version": "6.2.0",
+  "description": "CI support scripts for npm packages",
+  "main": "index.js",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix/wnpm-ci"
+  },
+  "scripts": {
+    "build": ":",
+    "test": "mocha --reporter mocha-env-reporter",
+    "release": "./scripts/wnpm-release.js"
+  },
+  "keywords": [
+    "ci",
+    "support",
+    "scripts",
+    "wix",
+    "npm"
+  ],
+  "author": "Gil Tayar <gilt@wix.com>",
+  "license": "MIT",
+  "bin": {
+    "wnpm-release": "./scripts/wnpm-release.js"
+  },
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "intercept-stdout": "^0.1.2",
+    "lodash": "^3.10.1",
+    "mocha": "^2.3.3",
+    "mocha-env-reporter": "latest",
+    "semver": "^5.1.0",
+    "sinon": "^1.17.5"
+  },
+  "dependencies": {
+    "shelljs": "^0.5.3",
+    "thenify": "^3.2.0"
+  }
+}

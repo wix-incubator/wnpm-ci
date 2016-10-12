@@ -14,7 +14,7 @@
 
     <groupId>com.wixpress.cloud</groupId>
     <artifactId>wnpm-ci</artifactId>
-    <name>WNPM CI</name>
+    <name>wnpm-ci</name>
     <description>
         CI Support NPM module
     </description>

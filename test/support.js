@@ -26,6 +26,9 @@ function cloneFolder(opts) {
   if (packageJson.name) {
     packageJson.name = options.name;
   }
+  if (options.registry) {
+    packageJson.publishConfig = {registry: options.registry};
+  }
   packageJson.private = options.private;
   writePackageJson(packageJson);
   return clonedDir;
@@ -76,6 +79,7 @@ function defaults() {
   return {
     folder: '.',
     name: undefined,
-    private: false
+    private: false,
+    registry: 'http://repo.dev.wix/artifactory/api/npm/npm-local/'
   };
 }

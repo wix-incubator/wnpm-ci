@@ -57,25 +57,25 @@ describe("wnpm-release", function () {
       packageJson = support.readPackageJson();
     });
 
-    it("should work with shrinkwrap", function (done) {
-      var currentPackageVersion = packageJson.version;
-      var packageName = packageJson.name;
+    // it("should work with shrinkwrap", function (done) {
+    //   var currentPackageVersion = packageJson.version;
+    //   var packageName = packageJson.name;
 
-      index.findPublishedVersions(packageName, function (err, publishedVersions) {
-        if (err) {
-          done(err);
-        } else {
-          var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
-            publishedVersions || []);
+    //   index.findPublishedVersions(packageName, function (err, publishedVersions) {
+    //     if (err) {
+    //       done(err);
+    //     } else {
+    //       var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
+    //         publishedVersions || []);
 
-          shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release", function (code) {
-            expect(code).to.equal(0);
-            expect(shelljs.test('-f', 'npm-shrinkwrap.json')).to.be.true;
-            checkPublishing(packageName, expectedNextVersion, done);
-          });
-        }
-      });
-    });
+    //       shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release", function (code) {
+    //         expect(code).to.equal(0);
+    //         expect(shelljs.test('-f', 'npm-shrinkwrap.json')).to.be.true;
+    //         checkPublishing(packageName, expectedNextVersion, done);
+    //       });
+    //     }
+    //   });
+    // });
 
     // it("should work without shrinkwrap", function (done) {
     //   var currentPackageVersion = packageJson.version;

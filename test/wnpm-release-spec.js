@@ -77,104 +77,104 @@ describe("wnpm-release", function () {
       });
     });
 
-    it("should work without shrinkwrap", function (done) {
-      var currentPackageVersion = packageJson.version;
-      var packageName = packageJson.name;
+    // it("should work without shrinkwrap", function (done) {
+    //   var currentPackageVersion = packageJson.version;
+    //   var packageName = packageJson.name;
 
-      index.findPublishedVersions(packageName, function (err, publishedVersions) {
-        if (err) {
-          done(err);
-        } else {
-          var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
-            publishedVersions || []);
+    //   index.findPublishedVersions(packageName, function (err, publishedVersions) {
+    //     if (err) {
+    //       done(err);
+    //     } else {
+    //       var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
+    //         publishedVersions || []);
 
-          shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --no-shrinkwrap", function (code) {
-            expect(code).to.equal(0);
-            expect(shelljs.test('-f', 'npm-shrinkwrap.json')).to.be.false;
+    //       shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --no-shrinkwrap", function (code) {
+    //         expect(code).to.equal(0);
+    //         expect(shelljs.test('-f', 'npm-shrinkwrap.json')).to.be.false;
 
-            checkPublishing_oldSignatureVersion(packageName, expectedNextVersion, done);
-          });
-        }
-      });
-    });
+    //         checkPublishing_oldSignatureVersion(packageName, expectedNextVersion, done);
+    //       });
+    //     }
+    //   });
+    // });
 
-    it("should publish if --publish-to-wix-registry", function (done) {
-      function packageJsonWithUnpublishableRepoButPublishableVersion(packageJson, version) {
-        return _.assign({}, packageJson, {version: version, publishConfig: {registry: 'http://registry.npmjs.org'}});
-      }
+    // it("should publish if --publish-to-wix-registry", function (done) {
+    //   function packageJsonWithUnpublishableRepoButPublishableVersion(packageJson, version) {
+    //     return _.assign({}, packageJson, {version: version, publishConfig: {registry: 'http://registry.npmjs.org'}});
+    //   }
 
-      function getVersionThatShouldntBeInTheRegistry(version) {
-        var semverVersion = semver.parse(version);
-        semverVersion.inc('minor');
-        semverVersion.patch = Math.ceil(Math.random() * 10000);
+    //   function getVersionThatShouldntBeInTheRegistry(version) {
+    //     var semverVersion = semver.parse(version);
+    //     semverVersion.inc('minor');
+    //     semverVersion.patch = Math.ceil(Math.random() * 10000);
 
-        return semverVersion.format();
-      }
+    //     return semverVersion.format();
+    //   }
 
-      var currentPackageVersion = packageJson.version;
-      var packageName = packageJson.name;
+    //   var currentPackageVersion = packageJson.version;
+    //   var packageName = packageJson.name;
 
-      index.findPublishedVersions(packageName, function (err, publishedVersions) {
-        if (err) {
-          done(err);
-        } else {
-          var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
-            publishedVersions || []);
-          var newlyExpectedNextVersion = getVersionThatShouldntBeInTheRegistry(expectedNextVersion);
-          var packageJson = support.readPackageJson();
+    //   index.findPublishedVersions(packageName, function (err, publishedVersions) {
+    //     if (err) {
+    //       done(err);
+    //     } else {
+    //       var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
+    //         publishedVersions || []);
+    //       var newlyExpectedNextVersion = getVersionThatShouldntBeInTheRegistry(expectedNextVersion);
+    //       var packageJson = support.readPackageJson();
 
-          support.writePackageJson(packageJsonWithUnpublishableRepoButPublishableVersion(packageJson,
-            newlyExpectedNextVersion));
+    //       support.writePackageJson(packageJsonWithUnpublishableRepoButPublishableVersion(packageJson,
+    //         newlyExpectedNextVersion));
 
-          shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --publish-to-wix-registry", function (code) {
-            expect(code).to.equal(0);
+    //       shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --publish-to-wix-registry", function (code) {
+    //         expect(code).to.equal(0);
 
-            support.writePackageJson(packageJson);
-            ensurePublishedVersionIncludesVersion(packageName, newlyExpectedNextVersion, 10, function (err, ensured) {
-              expect(err).to.be.undefined;
-              expect(ensured).to.be.true;
+    //         support.writePackageJson(packageJson);
+    //         ensurePublishedVersionIncludesVersion(packageName, newlyExpectedNextVersion, 10, function (err, ensured) {
+    //           expect(err).to.be.undefined;
+    //           expect(ensured).to.be.true;
 
-              done(err);
-            });
-          });
-        }
-      });
-    });
+    //           done(err);
+    //         });
+    //       });
+    //     }
+    //   });
+    // });
 
-    it("should not publish if package wasn't updated", function (done) {
-      const packageName = packageJson.name;
-      const currentPackageVersion = packageJson.version;
+    // it("should not publish if package wasn't updated", function (done) {
+    //   const packageName = packageJson.name;
+    //   const currentPackageVersion = packageJson.version;
 
-      index.findPublishedVersions(packageName, function (err, publishedVersions) {
-        if (err) {
-          done(err);
-        } else {
-          var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
-            publishedVersions || []);
+    //   index.findPublishedVersions(packageName, function (err, publishedVersions) {
+    //     if (err) {
+    //       done(err);
+    //     } else {
+    //       var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
+    //         publishedVersions || []);
 
-          shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --publish-to-wix-registry", function (code) {
-            expect(code).to.equal(0);
+    //       shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --publish-to-wix-registry", function (code) {
+    //         expect(code).to.equal(0);
 
-            ensurePublishedVersionIncludesVersion(packageName, expectedNextVersion, 10, function (err, ensured) {
-              expect(err).to.be.undefined;
-              expect(ensured).to.be.true;
+    //         ensurePublishedVersionIncludesVersion(packageName, expectedNextVersion, 10, function (err, ensured) {
+    //           expect(err).to.be.undefined;
+    //           expect(ensured).to.be.true;
 
-              resetPackageVersionTo(currentPackageVersion);
+    //           resetPackageVersionTo(currentPackageVersion);
 
-              shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --publish-to-wix-registry", function (code) {
-                expect(code).to.equal(0);
-                const packageJson = support.readPackageJson();
+    //           shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --publish-to-wix-registry", function (code) {
+    //             expect(code).to.equal(0);
+    //             const packageJson = support.readPackageJson();
 
-                expect(packageJson.private).to.be.true;
-                expect(packageJson.version).to.equal(expectedNextVersion);
-                expect(output).to.be.string("No release because it's already published");
-                done();
-              });
-            });
-          })
-        }
-      })
-    });
+    //             expect(packageJson.private).to.be.true;
+    //             expect(packageJson.version).to.equal(expectedNextVersion);
+    //             expect(output).to.be.string("No release because it's already published");
+    //             done();
+    //           });
+    //         });
+    //       })
+    //     }
+    //   })
+    // });
 
     function resetPackageVersionTo(currentPackageVersion) {
       packageJson.version = currentPackageVersion;

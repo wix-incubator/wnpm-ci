@@ -129,7 +129,7 @@ describe('VersionFetcher', () => {
     versionFetcher.copyVersion('/a', '/b', 'kaki.json');
   });
 
-  it.skip('should remove directories when done', (done) => {
+  it('should remove directories when done', (done) => {
     const cwd = '/';
     const randomDir1 = 'randomDir1';
     const randomDir2 = 'randomDir2';

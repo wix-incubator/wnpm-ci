@@ -20,7 +20,7 @@ describe('DirectoryDiff', () => {
     givenDiffReturns(0, 'output');
 
     directoryDiff.compareDirectories('v1', 'v2').then(_ => {
-      sinon.assert.calledWith(shelljs.exec, 'diff -rq --exclude=npm-shrinkwrap.json v1 v2');
+      sinon.assert.calledWith(shelljs.exec, 'diff -rq v1 v2');
       done();
     });
   });

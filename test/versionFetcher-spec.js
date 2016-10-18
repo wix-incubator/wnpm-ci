@@ -94,47 +94,38 @@ describe('VersionFetcher', () => {
     });
   });
 
-  it('should copy the version from one package to another', (done) => {
-    const remotePath = 'remote';
-    const localPath = 'local';
+  it('should copy the version from one package to another', () => {
+    const remotePath = '/remote';
+    const localPath = '/local';
+    const remoteFile = '/remote/kaki.json';
+    const localFile = '/local/kaki.json';
     const remoteVersion = 'remote version';
     const localVersion = 'local version';
 
+    const jsons = {
+      [remoteFile]: `{"version" : "${remoteVersion}"}`,
+      [localFile]: `{"version":"${localVersion}"}`
+    };
+
     const packageHandler = {
       readPackageJson: (path) => {
-        if (path == remotePath) {
-          return {version: remoteVersion}
-        } else if (path == localPath) {
-          return {version: localVersion}
-        }
+        return JSON.parse(jsons[path]);
       },
 
       writePackageJson: (path, currPackage) => {
-        expect(path).to.be.string(localPath);
-        expect(currPackage.version).to.be.string(remoteVersion);
-        done();
+        jsons[path] = JSON.stringify(currPackage);
       }
     };
 
     const versionFetcher = VersionFetcher(commander, shell, randomDirGenerator, packageHandler);
-    versionFetcher.copyVersion(remotePath, localPath);
+    versionFetcher.copyVersion(remotePath, localPath, 'kaki.json');
+    expect(packageHandler[remoteFile]).to.eql(packageHandler[localFile]);
+    expect(packageHandler.readPackageJson(localFile).version).to.eql(remoteVersion);
   });
 
-  it('should rewrite the package file', (done) => {
-    const localPath = 'local';
-    const localVersion = 'local version';
-
-    const packageHandler = {
-      readPackageJson: () => ({version: localVersion}),
-      writePackageJson: (path, currPackage) => {
-        expect(path).to.be.string(localPath);
-        assert.deepEqual(currPackage, {version: localVersion});
-        done();
-      }
-    };
-
-    const versionFetcher = VersionFetcher(commander, shell, randomDirGenerator, packageHandler);
-    versionFetcher.reWritePacakge(localPath)
+  it('should ignore exceptions when copying versions', () => {
+    const versionFetcher = VersionFetcher(commander, shell, randomDirGenerator, {});
+    versionFetcher.copyVersion('/a', '/b', 'kaki.json');
   });
 
   it.skip('should remove directories when done', (done) => {

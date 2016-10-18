@@ -23,7 +23,6 @@ describe('VersionComparator', () => {
     };
 
     versionFetcher = {
-      reWritePacakge: sinon.stub().returns(),
       copyVersion: sinon.stub().returns(),
       fetch: sinon.stub().returns(Promise.resolve(pathToRemoteVersion)),
       cloneAndPack: sinon.stub().returns(Promise.resolve(pathToPackedVersion)),
@@ -46,14 +45,8 @@ describe('VersionComparator', () => {
 
   it("should overwrite current version with pathToRemoteVersion", (done) => {
     versionComparator.compare(aPackageName, aVersion).then(() => {
-      expect(versionFetcher.copyVersion.calledWith(pathToPackedVersion, pathToRemoteVersion));
-      done();
-    });
-  });
-
-  it("should rewrite pathToRemoteVersion package file", (done) => {
-    versionComparator.compare(aPackageName, aVersion).then(() => {
-      expect(versionFetcher.reWritePacakge.calledWith(pathToRemoteVersion));
+      expect(versionFetcher.copyVersion.calledWith(pathToPackedVersion, pathToRemoteVersion, 'package.json'));
+      expect(versionFetcher.copyVersion.calledWith(pathToPackedVersion, pathToRemoteVersion, 'npm-shrinkwrap.json'));
       done();
     });
   });

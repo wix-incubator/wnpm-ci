@@ -118,9 +118,10 @@ describe('VersionFetcher', () => {
     };
 
     const versionFetcher = VersionFetcher(commander, shell, randomDirGenerator, packageHandler);
-    versionFetcher.copyVersion(remotePath, localPath, 'kaki.json');
+    versionFetcher.copyVersion(remotePath, localPath, 'kaki.json', x => Object.assign(x, {abc: 123}));
     expect(packageHandler[remoteFile]).to.eql(packageHandler[localFile]);
     expect(packageHandler.readPackageJson(localFile).version).to.eql(remoteVersion);
+    expect(packageHandler.readPackageJson(localFile).abc).to.eql(123);
   });
 
   it('should ignore exceptions when copying versions', () => {

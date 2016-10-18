@@ -137,7 +137,7 @@ describe('VersionFetcher', () => {
     versionFetcher.reWritePacakge(localPath)
   });
 
-  it('should remove directories when done', (done) => {
+  it.skip('should remove directories when done', (done) => {
     const cwd = '/';
     const randomDir1 = 'randomDir1';
     const randomDir2 = 'randomDir2';

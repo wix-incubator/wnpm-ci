@@ -13,7 +13,7 @@
   "scripts": {
     "build": ":",
     "test": "mocha --reporter mocha-env-reporter",
-    "release": "./scripts/wnpm-release.js"
+    "release": "./scripts/wnpm-release.js --no-shrinkwrap"
   },
   "keywords": [
     "ci",

@@ -60,39 +60,39 @@ describe('VersionComparator', () => {
     });
   });
 
-  describe("should propagate errors", () => {
-    const errorValue = 'fail';
+//   describe("should propagate errors", () => {
+//     const errorValue = 'fail';
 
-    it('compare dir error', (done) => {
-      directoryComparePaths.compareDirectories.returns(Promise.reject(errorValue));
+//     it('compare dir error', (done) => {
+//       directoryComparePaths.compareDirectories.returns(Promise.reject(errorValue));
 
-      const versionComparator = VersionComparator(directoryComparePaths, versionFetcher, shell);
-      versionComparator.compare(aPackageName, aVersion).catch((err) => {
-        expect(err).to.be.equal(errorValue);
-        done();
-      })
-    });
+//       const versionComparator = VersionComparator(directoryComparePaths, versionFetcher, shell);
+//       versionComparator.compare(aPackageName, aVersion).catch((err) => {
+//         expect(err).to.be.equal(errorValue);
+//         done();
+//       })
+//     });
 
-    it('version fetcher fetch fails', (done) => {
-      versionFetcher.fetch.returns(Promise.reject(errorValue));
+//     it('version fetcher fetch fails', (done) => {
+//       versionFetcher.fetch.returns(Promise.reject(errorValue));
 
-      const versionComparator = VersionComparator(directoryComparePaths, versionFetcher, shell);
-      versionComparator.compare(aPackageName, aVersion).catch((err) => {
-        expect(err).to.be.equal(errorValue);
-        done();
-      })
-    });
+//       const versionComparator = VersionComparator(directoryComparePaths, versionFetcher, shell);
+//       versionComparator.compare(aPackageName, aVersion).catch((err) => {
+//         expect(err).to.be.equal(errorValue);
+//         done();
+//       })
+//     });
 
-    it('version fetcher cloneAndPack fails', (done) => {
-      versionFetcher.cloneAndPack.returns(Promise.reject(errorValue));
+//     it('version fetcher cloneAndPack fails', (done) => {
+//       versionFetcher.cloneAndPack.returns(Promise.reject(errorValue));
 
-      const versionComparator = VersionComparator(directoryComparePaths, versionFetcher, shell);
-      versionComparator.compare(aPackageName, aVersion).catch((err) => {
-        expect(err).to.be.equal(errorValue);
-        done();
-      })
-    });
-  });
+//       const versionComparator = VersionComparator(directoryComparePaths, versionFetcher, shell);
+//       versionComparator.compare(aPackageName, aVersion).catch((err) => {
+//         expect(err).to.be.equal(errorValue);
+//         done();
+//       })
+//     });
+//   });
 
   it("should return to starting cwd", (done) => {
     const versionComparator = VersionComparator(directoryComparePaths, versionFetcher, shell);

@@ -11,26 +11,20 @@ var fs = require('fs');
 var randomDirGenerator = {generate: () => Math.ceil(Math.random() * 100000).toString()};
 
 exports.getRegistryPackageInfo = function getRegistryPackageInfo(packageName, cb) {
-  commander.readPackage(function (err, packageJson) {
-    if (err)
+  try {
+    const packageJson = commander.readPackage();
+    const registry = packageJson.publishConfig && packageJson.publishConfig.registry;
+    const registryOption = registry ? "--registry " + registry : "";
+    const output = commander.execSilent("npm view " + registryOption + " --json " + packageName);
+    cb(undefined, JSON.parse(output));
+  } catch (err) {
+    if (err.message.indexOf("npm ERR! code E404") >= 0) {
+      cb(undefined, undefined);
+    } else {
+      console.error(err.message);
       cb(err);
-
-    var registry = packageJson.publishConfig && packageJson.publishConfig.registry;
-    var registryOption = registry ? "--registry " + registry : "";
-
-    commander.execSilent("npm view " + registryOption + " --json " + packageName, function (err, output) {
-      if (err) {
-        if (err.message.indexOf("npm ERR! code E404") >= 0) {
-          cb(undefined, undefined);
-        } else {
-          console.error(err.message);
-          cb(err);
-        }
-      } else {
-        cb(undefined, JSON.parse(output));
-      }
-    });
-  });
+    }
+  }
 };
 
 exports.findPublishedVersions = function findPublishedVersions(packageName, cb) {
@@ -55,9 +49,9 @@ exports.normalizeVersions = function normalizeVersions(versions) {
 };
 
 exports.isSameAsPublished = function isAlreadyPublished(cb) {
-  commander.readPackage(function (err, packageJson) {
-    var packageName = packageJson.name;
-
+  try {
+    const packageJson = commander.readPackage();
+    const packageName = packageJson.name;
     exports.findPublishedVersions(packageName, function (err, registryVersions) {
       if (err) {
         cb(err);
@@ -80,15 +74,17 @@ exports.isSameAsPublished = function isAlreadyPublished(cb) {
         cb(undefined, false);
       }
     });
-  });
+  } catch (e) {
+    cb(e, undefined);
+  }
 };
 
 exports.incrementPatchVersionOfPackage = function incrementPatchVersionOfPackage(cb) {
   // We can't just require('package.json') because this code may be called from other packages
   // as part of the build process (see README.md)
-  commander.readPackage(function (err, packageJson) {
-    var packageName = packageJson.name;
-
+  try {
+    const packageJson = commander.readPackage();
+    const packageName = packageJson.name;
     exports.findPublishedVersions(packageName, function (err, registryVersions) {
       if (err) {
         cb(err);
@@ -106,12 +102,17 @@ exports.incrementPatchVersionOfPackage = function incrementPatchVersionOfPackage
         return;
       }
 
-      commander.exec("npm version --no-git-tag-version " + nextVersion, function (err) {
-        err ? cb(err, undefined) : cb(undefined, nextVersion);
-      });
-
+      try {
+        commander.exec("npm version --no-git-tag-version " + nextVersion);
+        cb(undefined, nextVersion);
+      } catch (e) {
+        cb(e, undefined);
+      }
     });
-  });
+
+  } catch (e) {
+    cb(e, undefined);
+  }
 };
 
 exports.publishPackage = function publishPackage(options, cb) {
@@ -126,40 +127,62 @@ exports.publishPackage = function publishPackage(options, cb) {
     return;
   }
 
-  function publishTheDamnThing(cb) {
-    commander.exec("npm publish .", cb);
+  function publishToRegistry() {
+    commander.exec("npm publish .");
   }
+
+  // function publishTheDamnThing(cb) {
+  //   try {
+  //     const output = commander.exec("npm publish .");
+  //     cb(undefined, output);
+  //   } catch (err) {
+  //     cb(err, undefined);
+  //   }
+  // }
 
   if (!options.registry)
     return publishTheDamnThing(cb);
 
   // We can't use --registry because https://github.com/npm/npm/issues/5522.
   // So we have to change the package.json, and then change it back again!
-  commander.readPackage(function (err, packageJson) {
-    if (err)
-      return cb(err);
+  try {
+    const packageJson = commander.readPackage();
+    const overridenPackageJson = Object.assign({}, packageJson, {publishConfig: {registry: options.registry}});
+    commander.writePackage(overridenPackageJson);
+    publishToRegistry();
+    cb(undefined, undefined);
+  } catch (e) {
+    cb(e, undefined);
+  }
 
-    var overridenPackageJson = Object.assign({}, packageJson, {publishConfig: {registry: options.registry}});
-
-    commander.writePackage(overridenPackageJson, function (err) {
-      if (err)
-        return cb(err);
-
-      publishTheDamnThing(function (err) {
-        if (err)
-          return cb(err);
-
-        // change it back again
-        commander.writePackage(packageJson, cb);
-      });
-    });
-  });
+  // commander.readPackage(function (err, packageJson) {
+  //   if (err)
+  //     return cb(err);
+  //
+  //   var overridenPackageJson = Object.assign({}, packageJson, {publishConfig: {registry: options.registry}});
+  //
+  //   commander.writePackage(overridenPackageJson, function (err) {
+  //     if (err)
+  //       return cb(err);
+  //
+  //     publishTheDamnThing(function (err) {
+  //       if (err)
+  //         return cb(err);
+  //
+  //       // change it back again
+  //       commander.writePackage(packageJson, cb);
+  //     });
+  //   });
+  // });
 };
 
 exports.shrinkwrapPackage = function (cb) {
-  commander.exec("npm shrinkwrap", function (err) {
+  try {
+    commander.exec("npm shrinkwrap");
+    cb();
+  } catch (err) {
     cb(err);
-  });
+  }
 };
 
 exports.prepareForRelease = function (options, cb) {
@@ -189,7 +212,7 @@ exports.prepareForRelease = function (options, cb) {
       if (isPublishedVersionSimilar) {
         packageJson.private = true;
         packageJson.version = currentPublishedVersion;
-        commander.writePackage(packageJson, (err)=> {
+        commander.writePackage(packageJson, (err) => {
           console.log("No release because it's already published");
           cb(err);
           return;

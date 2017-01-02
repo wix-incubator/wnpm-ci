@@ -8,7 +8,6 @@ var intercept = require('intercept-stdout');
 var semver = require('semver');
 
 var index = require('..');
-var ci = require('ci-info');
 
 function updatePackageContent() {
   support.addLineToReadme();
@@ -17,9 +16,8 @@ function updatePackageContent() {
 describe("wnpm-release", function () {
   // This test will work only in CI given that it's a destructive test (it really publishes!)
   // If you want to test it locally, do `IS_BUILD_AGENT=1 npm test`
-  if (ci.isCI) {
+  if (!process.env.IS_BUILD_AGENT)
     return;
-  }
 
   this.timeout(100000);
   var tempDir, packageJson, unhook, output;

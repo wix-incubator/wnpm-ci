@@ -9,7 +9,6 @@ var VersionComparator = require('./lib/VersionComparator');
 var shelljs = require('shelljs');
 var fs = require('fs');
 var randomDirGenerator = {generate: () => Math.ceil(Math.random() * 100000).toString()};
-var ci = require('ci-info');
 
 exports.getRegistryPackageInfo = function getRegistryPackageInfo(packageName, cb) {
   commander.readPackage(function (err, packageJson) {
@@ -121,8 +120,7 @@ exports.publishPackage = function publishPackage(options, cb) {
     cb = options;
     options = {};
   }
-
-  if (!ci.isCI) {
+  if (!process.env['IS_BUILD_AGENT']) {
     console.warn('not publishing package because we\'re not running in a CI build agent');
     cb();
     return;

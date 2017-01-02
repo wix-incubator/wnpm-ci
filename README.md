@@ -126,4 +126,3 @@ Write your own! We even give you all the logic that we use in our own `wnpm-rele
 
 * `require('wnpm-ci')` exposes various apis that you can use to build your own release logic.
 * `require('wnpm-ci/lib/version-calculations')` exposes more apis that can also be used
-

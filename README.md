@@ -1,4 +1,4 @@
-# wnpm-ci [![Build Status](https://img.shields.io/travis/wix/wnpm-ci/master.svg?label=build%20status)](https://travis-ci.org/wix/wnpm-ci) [![npm version](https://img.shields.io/npm/v/wnpm-ci.svg)](https://www.npmjs.com/package/wnpm-ci)
+# wnpm-ci
 
 # What is this module
 This module contains all you need to have the ci build an npm package in the CI servers.

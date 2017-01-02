@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+- '4'
+- '6'
+- '7'
+before_deploy: npm run release
+deploy:
+  skip_cleanup: true
+  provider: npm
+  email: viliusl@wix.com
+  api_key:
+    secure: ra2FrvmoPYPqABO4K2Ij5cY+i0BIN0ojN33GnfxT6/8R0Mhgz0en1pEzEnVhLbxibiyo2aRbtBQZLk1kXHZQKgCxChR3gALS4bJm+hkE8qpHdioVRC9Hwoe22oUgIVwmFZK6rZEochqNQ/DfpbLeR1SWC73Lf2Gk7okNQqp5ZYZdqoMI8z6V0EMA5yzj+NvUTtn0NSI4fpVCzkKi3MQcf72N60j1sQHVpfCEzaNlzoO74H/yPvZIEB6bRzMylZ5HK9FIR0Wg4fxd26ItycF0rH6gG1vzLvMxf1imQKLnEwk1rggZHtgHHmq0vadCjSPPulzcSkLQ1V8cdV46xXk1U8YOObRFQta4vHsKGARGlhl+Pu7CZ9u7nlBwZ5BNliB+m1wd8ycXkUihDqqEd4/x1O3yB7/DV5rtfby/vpzQxm5Tyc8+Lb3UAiq6/i+59+3xNnc/V2KD4HjThv5+GuNzJ8Je2gU+OcrJnBE9eYnM8TRRflenn0HkcjlmI1jqAlvrHeVB7Esr5YV9I3bf6/zy+HpVf05uMgcWTgmzlVx4KI6IE+cnUN8/A/iz3mAwGtncbI2qnqcBYg5Zml62QjInKOPXZ/Qp3HmpxanIeBklUlvOZuozEdgkMiEbOlvGGPsXFQqQiB1Tpgd+3c6Yq3TAfyPWamBNpYtXL9kugbMk9Y8=
+  on:
+    branch: master
+    node: '7' # release only after last build success

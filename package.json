@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "chai": "^3.3.0",
+    "ci-info": "~1.0.0",
     "intercept-stdout": "^0.1.2",
     "lodash": "^3.10.1",
     "mocha": "^2.3.3",
@@ -39,5 +40,8 @@
   "dependencies": {
     "shelljs": "^0.5.3",
     "thenify": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=4"
   }
 }

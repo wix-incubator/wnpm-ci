@@ -34,24 +34,14 @@ describe('npm commander', function() {
       commander.setup();
     });
 
-    it('exec() should fail given an invalid command', done => {
-      commander.exec('npmzqwe install', (error, output) => {
-        expect(output).to.be.undefined;
-        expect(error).to.be.instanceof(Error);
-        expect(error.message).to.contain('not found');
-        done();
-      });
+    it('exec() should fail given an invalid command', () => {
+      expect(() => commander.exec('npmzqwe install')).to.throw('not found');
     });
 
-    it('exec() should run command via "nvm", print command execution output, return collected output', done => {
-      commander.exec('npm install', (error, output) => {
-        expect(error).to.be.undefined;
-
-        expect(stdout).to.contain('Running \'nvm exec npm install\'');
-        expect(output).to.contain('npm WARN');
-
-        done();
-      });
+    it('exec() should run command via "nvm", print command execution output, return collected output', () => {
+      const output = commander.exec('npm install');
+      expect(stdout).to.contain('Running \'nvm exec npm install\'');
+      expect(output).to.contain('npm WARN');
     });
   });
 
@@ -61,39 +51,25 @@ describe('npm commander', function() {
       tempDir = support.clone({folder: './test/apps/without-nvmrc'});
     });
 
-    it('exec() should fail given an invalid command', done => {
-      commander.exec('npmzqwe install', (error, output) => {
-        expect(output).to.be.undefined;
-        expect(error).to.be.instanceof(Error);
-        expect(error.message).to.contain('not found');
-        done();
-      });
+    it('exec() should fail given an invalid command', () => {
+      expect(() => commander.exec('npmzqwe install')).to.throw('not found');
     });
 
-    it('exec() should run command via "npm", print command execution output, return collected output', done => {
-      commander.exec('npm install', (error, output) => {
-        expect(error).to.be.undefined;
-
-        expect(stdout).to.contain('Running \'npm install\'');
-        expect(output).to.contain('npm WARN');
-
-        done();
-      });
+    it('exec() should run command via "nvm", print command execution output, return collected output', () => {
+      const output = commander.exec('npm install');
+      expect(stdout).to.contain('Running \'npm install\'');
+      expect(output).to.contain('npm WARN');
     });
   });
 
   describe('execSilent() should not print command output to stdout', () => {
 
-    beforeEach(() => {
-      tempDir = support.clone({folder: './test/apps/without-nvmrc'});
-    });
+    beforeEach(() => tempDir = support.clone({folder: './test/apps/without-nvmrc'}));
 
-    it('exec() should run command in silent mode', done => {
-      commander.execSilent('npm install', (error, output) => {
-        expect(stdout).to.not.contain('npm WARN');
-        expect(output).to.contain('npm WARN');
-        done();
-      });
+    it('exec() should run command in silent mode', () => {
+      const output = commander.exec('npm install');
+      expect(stdout).to.not.contain('npm WARN');
+      expect(output).to.contain('npm WARN');
     });
   });
 });

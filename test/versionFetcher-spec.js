@@ -5,7 +5,8 @@ var assert = require('chai').assert;
 var _ = require('lodash');
 var VersionFetcher = require('../lib/VersionFetcher');
 
-describe('VersionFetcher', () => {
+describe('VersionFetcher', function() {
+  this.timeout(10000);
   const packageVersion = '1.2.3';
   const packageName = 'moshe';
   const rootTempPath = '/tmp';
@@ -34,12 +35,12 @@ describe('VersionFetcher', () => {
     commands = [];
 
     commander = {
-      exec: (arg, cb) => {
+      exec: arg => {
         commands.push(arg);
         if (arg.indexOf('npm pack') > -1) {
-          cb(undefined, tarFileName);
+          return tarFileName;
         } else {
-          cb();
+          return undefined;
         }
       }
     };
@@ -158,9 +159,7 @@ describe('VersionFetcher', () => {
 
       beforeEach(() => {
         const givenNpmErr = {
-          exec: (arg, cb) => {
-            cb('error');
-          }
+          exec: () => { throw 'error' }
         };
 
         versionFetcher = VersionFetcher(givenNpmErr,
@@ -189,7 +188,7 @@ describe('VersionFetcher', () => {
 
       beforeEach(() => {
         let shellErr = shell;
-        shellErr.exec = (cmd, cb) => cb(1, '123', 'error');
+        shellErr.exec = () => {throw 'error'};
 
         versionFetcher = VersionFetcher(commander,
           shellErr,

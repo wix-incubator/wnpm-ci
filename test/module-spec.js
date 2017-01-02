@@ -117,13 +117,16 @@ describe('package', function () {
 
     const getPackage = (packegeName, cb) => {
       tempDir = support.cloneDir();
-      commander.exec(`npm pack ${packegeName}`, function (err, output) {
+      try {
+        const output = commander.exec(`npm pack ${packegeName}`);
         support.tarExtract(output, () => {
           shelljs.cd('./package');
           packageJson = support.readPackageJson();
           cb();
         });
-      });
+      } catch (e) {
+        cb(e, undefined);
+      }
     };
 
     beforeEach(function (done) {

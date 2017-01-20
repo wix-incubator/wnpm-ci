@@ -18,7 +18,7 @@ exports.getRegistryPackageInfo = function getRegistryPackageInfo(packageName, cb
     var registry = packageJson.publishConfig && packageJson.publishConfig.registry;
     var registryOption = registry ? "--registry " + registry : "";
 
-    commander.execSilent("npm view " + registryOption + " --json " + packageName, function (err, output) {
+    commander.execSilent("npm view --cache-min=0 " + registryOption + " --json " + packageName, function (err, output) {
       if (err) {
         if (err.message.indexOf("npm ERR! code E404") >= 0) {
           cb(undefined, undefined);

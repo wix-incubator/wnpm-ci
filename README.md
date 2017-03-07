@@ -11,7 +11,7 @@ It also exports functions that can help write an alternative release logic if so
   * `name`
   * `version`
   * One of two: 
-    * `publishConfig.registry` pointing to `http://repo.dev.wix/artifactory/api/npm/npm-local/` or...
+    * `publishConfig.registry` pointing to `https://repo.dev.wixpress.com/artifactory/api/npm/npm-repos/` or...
     * `publishConfig.registry` pointing to `https://registry.npmjs.org/` if you want to publish it to the public repository (for an open source npm module), or...
     * `private: true` if you don't want to publish the module     
 * Run `npm install --save-dev wnpm-ci` to install this package
@@ -31,7 +31,7 @@ This requirement will be removed in the near future. See below for a minimal pom
   "name": "my-package",
   "version": "1.0.0",
   "publishConfig": {
-    "registry": "http://repo.dev.wix/artifactory/api/npm/npm-local/"
+    "registry": "https://repo.dev.wixpress.com/artifactory/api/npm/npm-repos/"
   },
   "scripts": {
     "build": ":", 
@@ -50,7 +50,7 @@ This requirement will be removed in the near future. See below for a minimal pom
   "name": "my-package",
   "version": "1.0.0",
   "publishConfig": {
-    "registry": "http://repo.dev.wix/artifactory/api/npm/npm-local/"
+    "registry": "https://repo.dev.wixpress.com/artifactory/api/npm/npm-repos/"
   },
   "scripts": {
     "build": "babel src --out-dir lib", 

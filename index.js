@@ -205,7 +205,7 @@ exports.prepareForRelease = function (options, cb) {
 
           function continue1(cb) {
             if (options.shouldPublishToWixRegistry)
-              exports.publishPackage({registry: "http://repo.dev.wix/artifactory/api/npm/npm-local/"}, cb);
+              exports.publishPackage({registry: "https://repo.dev.wixpress.com/artifactory/api/npm/npm-repos/"}, cb);
             else
               cb();
           }

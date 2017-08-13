@@ -50,7 +50,7 @@ describe("wnpm-release", function () {
     });
   });
 
-  describe('for regular package', function () {
+  describe.skip('for regular package', function () {
     beforeEach(function () {
       tempDir = support.clone({name: 'npm-module-for-testing-publish'});
       updatePackageContent();

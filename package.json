@@ -32,7 +32,7 @@
     "intercept-stdout": "^0.1.2",
     "lodash": "^3.10.1",
     "mocha": "^2.3.3",
-    "mocha-env-reporter": "latest",
+    "mocha-env-reporter": "~2.0.4",
     "semver": "^5.1.0",
     "sinon": "^1.17.5"
   },

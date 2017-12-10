@@ -6,6 +6,7 @@ var support = require('./support');
 var shelljs = require('shelljs');
 var intercept = require('intercept-stdout');
 var semver = require('semver');
+var fs = require('fs');
 
 var index = require('..');
 
@@ -138,6 +139,33 @@ describe("wnpm-release", function () {
             });
           });
         }
+      });
+    });
+
+    it("should only keep production dependencies when --only-production flag is given", function(done) {
+      var currentPackageVersion = packageJson.version;
+      var packageName = packageJson.name;
+
+      index.findPublishedVersions(packageName, function (err, publishedVersions) {
+        if (err) {
+          done(err);
+        } else {
+          var expectedNextVersion = versionCalc.calculateNextVersionPackage(currentPackageVersion,
+            publishedVersions || []);
+
+          shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --only-production", function (code) {
+            expect(code).to.equal(0);
+            expect(shelljs.test('-f', 'npm-shrinkwrap.json')).to.be.true;
+            ensureNoDevDependenciesExist(done);
+          });
+        }
+      });
+    });
+
+    it("should not allow --only-production when --no-shrinkwrap is provided", function(done) {
+      shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --only-production --no-shrinkwrap", function (code) {
+        expect(code).to.equal(1);
+        done();
       });
     });
 
@@ -294,3 +322,25 @@ function ensurePublishedVersionIncludesVersion(packageName, expectedVersion, cou
   });
 }
 
+function ensureNoDevDependenciesExist(done) {
+  fs.readFile('npm-shrinkwrap.json', 'utf-8', function(err, content) {
+    if(err) {
+      done(err)
+    } else {
+      var shrinkwrapJson = JSON.parse(content);
+      var dependencies = shrinkwrapJson.dependencies
+      ensureNoDevDependencies(dependencies);
+      done();
+    }
+  });
+}
+
+function ensureNoDevDependencies(dependencies) {
+  if(dependencies && !_.isEmpty(dependencies)) {
+    _.forEach(dependencies, function(dependency, name) {
+      var errorMessage = 'Expected no dev dependencies, but found: ' + name;
+      expect(dependency.dev, errorMessage).to.not.be.true;
+      ensureNoDevDependencies(dependency.dependencies)
+    });
+  }
+}

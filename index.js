@@ -158,8 +158,10 @@ exports.publishPackage = function publishPackage(options, cb) {
   });
 };
 
-exports.shrinkwrapPackage = function (cb) {
-  commander.exec("npm shrinkwrap", function (err) {
+exports.shrinkwrapPackage = function (cb, options) {
+  options = options || {};
+  var command = options.shouldOnlyKeepProductionDependencies ? "npm shrinkwrap --production" : "npm shrinkwrap";
+  commander.exec(command, function (err) {
     cb(err);
   });
 };
@@ -217,7 +219,7 @@ exports.prepareForRelease = function (options, cb) {
               }
               else
                 continue1(cb);
-            });
+            }, options);
           }
           else
             continue1(cb);

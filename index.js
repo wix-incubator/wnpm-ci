@@ -56,7 +56,7 @@ exports.normalizeVersions = function normalizeVersions(versions) {
     return versions;
 };
 
-exports.isSameAsPublished = function isAlreadyPublished(cb, options) {
+exports.isSameAsPublished = function isAlreadyPublished(cb) {
   commander.readPackage(function (err, packageJson) {
     var packageName = packageJson.name;
 
@@ -71,7 +71,7 @@ exports.isSameAsPublished = function isAlreadyPublished(cb, options) {
 
       if (currentPublishedVersion) {
         var packageHandler = PackageHandler(fs, shelljs);
-        var versionFetcher = VersionFetcher(commander, shelljs, randomDirGenerator, packageHandler, options);
+        var versionFetcher = VersionFetcher(commander, shelljs, randomDirGenerator, packageHandler);
         var directoryDiff = DirectoryDiff(shelljs);
         var versionComparator = VersionComparator(directoryDiff, versionFetcher, shelljs);
 
@@ -223,6 +223,6 @@ exports.prepareForRelease = function (options, cb) {
             continue1(cb);
         });
       }
-    }, {packQuietly: options.shouldPackQuietly});
+    });
   });
 };

@@ -218,6 +218,23 @@ describe("wnpm-release", function () {
     });
 
   })
+
+  describe('Support --pack-quietly flag', function () {
+    beforeEach(function () {
+      tempDir = support.clone({name: 'npm-module-for-testing-publish'});
+      updatePackageContent();
+      shelljs.rm('.nvmrc');
+    });
+
+
+    it('should pass the quiet flag to npm pack', function (done) {
+      shelljs.exec('node ' + __dirname + "/../scripts/wnpm-release --pack-quietly", function (code) {
+        expect(code).to.equal(0);
+        expect(output).not.to.have.string('=== Tarball Contents ===')
+        done();
+      });
+    });
+  });
 });
 
 // remove backwards compatibility in Jun/2016

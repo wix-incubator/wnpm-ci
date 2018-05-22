@@ -29,6 +29,7 @@ describe('VersionFetcher', () => {
   let randomDirGenerator;
   let packageHandler;
   let versionFetcher;
+  let quietVersionFetcher;
   let commands;
   beforeEach(() => {
     commands = [];
@@ -63,6 +64,7 @@ describe('VersionFetcher', () => {
     };
 
     versionFetcher = VersionFetcher(commander, shell, randomDirGenerator, packageHandler);
+    quietVersionFetcher = VersionFetcher(commander, shell, randomDirGenerator, packageHandler, {packQuietly: true});
   });
 
   it('should retrieve the version from npm and pack it', (done) => {
@@ -91,6 +93,20 @@ describe('VersionFetcher', () => {
       ]);
       expect(pathToCloned).to.be.string(`${rootTempPath}/v1/package`);
       done();
+    });
+  });
+
+  describe('with packQuietly option given as true', () => {
+    it('should pass --quiet flag to npm pack in fetch', () => {
+      return quietVersionFetcher.fetch(packageName, packageVersion)
+        .then(() => expect(commands).to.contain(`npm pack ${packageName}@${packageVersion} --quiet`));
+    });
+
+    it('should pass --quiet flag to npm pack in cloneAndPack', () => {
+      var cwd = 'cwd';
+
+      return quietVersionFetcher.cloneAndPack(cwd)
+        .then(() => expect(commands).to.contain(`npm pack ${cwd} --quiet`));
     });
   });
 

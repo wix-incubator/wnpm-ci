@@ -107,6 +107,7 @@ Replace the text between the *****
   that are the same as the ones at the time of the build
   * Note that since CI does this, it will not be committed to git
   * If you don't like this behavior, you can use `wnpm-release --no-shrinkwrap` instead
+  * If you want to only keep production dependencies in the packed package, use the `--only-production` flag.
 * If the registry in the `publishConfig` is not Wix's internal registry, 
   you can also do `wnpm-release --publish-to-wix-registry` to make `wnpm-release` publish it to the Wix registry
 * If you want to silent the logs from `npm pack`, pass `--pack-quietly`  

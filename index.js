@@ -1,5 +1,4 @@
 "use strict";
-var child_process = require('child_process');
 var versionCalc = require('./lib/version-calculations');
 var commander = require('./lib/npm-commander');
 var DirectoryDiff = require('./lib/DirectoryDiff');
@@ -158,8 +157,9 @@ exports.publishPackage = function publishPackage(options, cb) {
   });
 };
 
-exports.shrinkwrapPackage = function (cb) {
-  commander.exec("npm shrinkwrap", function (err) {
+exports.shrinkwrapPackage = function (cb, options) {
+  var command = options && options.shouldOnlyKeepProductionDependencies ? "npm shrinkwrap --production" : "npm shrinkwrap";
+  commander.exec(command, function (err) {
     cb(err);
   });
 };
@@ -217,7 +217,7 @@ exports.prepareForRelease = function (options, cb) {
               }
               else
                 continue1(cb);
-            });
+            }, {shouldOnlyKeepProductionDependencies: options.shouldOnlyKeepProductionDependencies});
           }
           else
             continue1(cb);

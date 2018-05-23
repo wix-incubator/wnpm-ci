@@ -14,7 +14,7 @@ if(!shouldShrinkWrap && shouldOnlyKeepProductionDependencies) {
 require('../index').prepareForRelease({
   shouldShrinkWrap: shouldShrinkWrap,
   shouldPublishToWixRegistry: shouldPublishToWixRegistry,
-  shouldPackQuietly: shouldPackQuietly
+  shouldPackQuietly: shouldPackQuietly,
   shouldOnlyKeepProductionDependencies: shouldOnlyKeepProductionDependencies
 }, function(err) {
   if (err) {

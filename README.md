@@ -5,36 +5,34 @@ This module contains all you need to have the ci build an npm package in the CI 
 
 This module exports a bin (`wnpm-release`) that knows how to build and release a module the wix standard way.
 It also exports functions that can help write an alternative release logic if somebody wants to.
-  
+
 # How to create an NPM module that works in CI
 * Create a package with the following mandatory things in the package.json
   * `name`
   * `version`
-  * One of two: 
-    * `publishConfig.registry` pointing to `http://repo.dev.wix/artifactory/api/npm/npm-local/` or...
+  * One of two:
+    * `publishConfig.registry` pointing to `http://npm.dev.wixpress.com/` or...
     * `publishConfig.registry` pointing to `https://registry.npmjs.org/` if you want to publish it to the public repository (for an open source npm module), or...
-    * `private: true` if you don't want to publish the module     
+    * `private: true` if you don't want to publish the module
 * Run `npm install --save-dev wnpm-ci` to install this package
 * Ensure that you have a "build" script in your package.json. If you have nothing to do in this step, make it `":"`
 * Ensure that you have a "test" script in your package.json. If you have nothing to do in this step, make it `":"`
-* Ensure that you have a "release" script in your package.json, and make 
+* Ensure that you have a "release" script in your package.json, and make
 this `"wnpm-release"` (the wnpm-release will be coming from this package, which you installed earlier)
-  * If you publish the module to a registry that is not Wix's, you can choose to cross-publish it to the Wix registry
-    using `wnpmrelease --publish-to-wix-registry`.
-* Add a pom.xml, because currently CI does not work without a pom.xml. 
+* Add a pom.xml, because currently CI does not work without a pom.xml.
 This requirement will be removed in the near future. See below for a minimal pom.xml
-* If your package is using dependencies from the Wix NPM repo, it should contain an `.npmrc` file at its root directory with the line `registry=http://repo.dev.wix/artifactory/api/npm/npm-repos`.
-    
+* If your package is using dependencies from the Wix NPM repo, it should contain an `.npmrc` file at its root directory with the line `registry=http://npm.dev.wixpress.com/`.
+
 ## A minimal package.json with all the above
 ```json
 {
   "name": "my-package",
   "version": "1.0.0",
   "publishConfig": {
-    "registry": "http://repo.dev.wix/artifactory/api/npm/npm-local/"
+    "registry": "http://npm.dev.wixpress.com/"
   },
   "scripts": {
-    "build": ":", 
+    "build": ":",
     "test": ":",
     "release": "wnpm-release # This will ensure that ci publishes the module"
   },
@@ -50,10 +48,10 @@ This requirement will be removed in the near future. See below for a minimal pom
   "name": "my-package",
   "version": "1.0.0",
   "publishConfig": {
-    "registry": "http://repo.dev.wix/artifactory/api/npm/npm-local/"
+    "registry": "http://npm.dev.wixpress.com/"
   },
   "scripts": {
-    "build": "babel src --out-dir lib", 
+    "build": "babel src --out-dir lib",
     "test": "mocha",
     "release": "wnpm-release # This will ensure that ci publishes the module"
   },
@@ -95,22 +93,16 @@ Replace the text between the *****
   * `npm install` - no need to do anything
   * `npm run build`
   * `npm test`
-  * If package is not private (https://docs.npmjs.com/files/package.json#private): `npm run release` 
+  * If package is not private (https://docs.npmjs.com/files/package.json#private): `npm run release`
 * Once done, it will publish the package, assuming it is not private
 
 ## What does `wnpm-release` do?
 * Nothing if the package is private. Leave it there still for future use.
-* Increments the version in package.json so that publishing will succeed 
+* Increments the version in package.json so that publishing will succeed
   (see below to understand the algorithm of version incrementing)
   * Note that since CI is running `wnpm-release` during the build, the version change in `package.json` will not be committed to git
-* shrinkwraps the package so that the published package will always use the dependent versions 
-  that are the same as the ones at the time of the build
-  * Note that since CI does this, it will not be committed to git
-  * If you don't like this behavior, you can use `wnpm-release --no-shrinkwrap` instead
-* If the registry in the `publishConfig` is not Wix's internal registry, 
-  you can also do `wnpm-release --publish-to-wix-registry` to make `wnpm-release` publish it to the Wix registry
-* If you want to silent the logs from `npm pack`, pass `--pack-quietly`  
-
+* If you prefer to bump the minor version instead of patch, you can also do `wnpm-release --bump-minor`
+* Note that `wnpm-release` no longer creates a shrinkwrap. If you want a shrinkwrap simply use `wnpm-release && npm shrinkwrap` in your release script
 
 ## How `wnpm-release` increments the version
 * TL;DR - it increments by one the patch version of the latest patch version in the npm registry
@@ -121,9 +113,3 @@ Replace the text between the *****
 * If the version found in the previous bullet is bigger than the version in the package.json, it uses it (and increments it by one) otherwise it uses the version in the package.json
 
 **What it means**: Think of each list of 'major.minor' versions as a branch. The algorithm finds the branch of the version in the package json, and ignores all other branches. If the branch is empty, it will just use the version in package.json, otherwise it will use the Max of (the latest version in the branch, the package.json version) + 1.
-
-# What if I don't like what `wnpm-release` does?
-Write your own! We even give you all the logic that we use in our own `wnpm-release`, as an api:
-
-* `require('wnpm-ci')` exposes various apis that you can use to build your own release logic.
-* `require('wnpm-ci/lib/version-calculations')` exposes more apis that can also be used

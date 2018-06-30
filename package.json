@@ -1,6 +1,6 @@
 {
   "name": "wnpm-ci",
-  "version": "6.2.0",
+  "version": "7.0.0",
   "description": "CI support scripts for npm packages",
   "main": "index.js",
   "publishConfig": {
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": ":",
-    "test": "mocha --reporter mocha-env-reporter",
+    "test": "mocha --reporter mocha-env-reporter --timeout 60000",
     "release": "./scripts/wnpm-release.js --no-shrinkwrap"
   },
   "keywords": [
@@ -29,15 +29,11 @@
   },
   "devDependencies": {
     "chai": "^3.3.0",
-    "intercept-stdout": "^0.1.2",
-    "lodash": "^3.10.1",
     "mocha": "^2.3.3",
-    "mocha-env-reporter": "~2.0.4",
-    "semver": "^5.1.0",
-    "sinon": "^1.17.5"
+    "mocha-env-reporter": "~2.0.4"
   },
   "dependencies": {
-    "shelljs": "^0.5.3",
-    "thenify": "^3.2.0"
+    "semver": "^5.1.0",
+    "tmp": "0.0.33"
   }
 }

@@ -6,7 +6,7 @@ const versionCalculations = require('./lib/version-calculations');
 
 function getRegistryPackageInfo(cwd) {
   try {
-    return JSON.parse(execSync('npm view --cache-min=0 --json', {cwd}));
+    return JSON.parse(execSync('npm view --cache-min=0 --json', {cwd, stdio: 'pipe'}));
   } catch (e) {
     if (e.message.indexOf('npm ERR! code E404') >= 0) {
       return undefined;

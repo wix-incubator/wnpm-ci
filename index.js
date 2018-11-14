@@ -61,7 +61,18 @@ function prepareForRelease(options) {
     console.log('No release because package is private');
   } else {
     const registryVersions = findPublishedVersions(options.cwd);
-    const currentPublishedVersion = isSameAsPublished(registryVersions, options);
+    let currentPublishedVersion;
+
+    try {
+      currentPublishedVersion = isSameAsPublished(registryVersions, options);
+    }
+    catch (err) {
+      console.log("An error has occurred while comparing current version to published version:");
+      console.log(err.stack || err);
+      console.log("Since comparing the versions has failed, a new version will still be released!");
+      currentPublishedVersion = false;
+    }
+
     if (currentPublishedVersion) {
       pkg.private = true;
       pkg.version = currentPublishedVersion;

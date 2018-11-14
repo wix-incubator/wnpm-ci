@@ -57,6 +57,19 @@ describe('wnpm-release', () => {
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.equal('6.2.0');
   });
+
+  it('should bump version if comparing to published version fails', () => {
+    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const originalFetch = versionFetcher.fetch;
+    versionFetcher.fetch = () => { throw new Error("Failed!")};
+    prepareForRelease({cwd});
+    versionFetcher.fetch = originalFetch;
+
+    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    expect(pkg.private).to.equal(undefined);
+    expect(pkg.version).to.not.equal('6.2.0');
+    expect(pkg.version).to.contain('6.2.');
+  });
 });
 
 describe('wnpm-release cli', () => {

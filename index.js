@@ -14,12 +14,12 @@ function getRegistryPackageInfo(cwd) {
       throw e;
     }
   }
-};
+}
 
 function findPublishedVersions(cwd) {
   const result = getRegistryPackageInfo(cwd);
   return normalizeVersions(result && result.versions);
-};
+}
 
 function normalizeVersions(versions) {
   if (!versions) {
@@ -29,7 +29,7 @@ function normalizeVersions(versions) {
   } else {
     return versions;
   }
-};
+}
 
 function isSameAsPublished(registryVersions, options) {
   const localPackageVersion = packageHandler.readPackageJson(path.join(options.cwd, 'package.json')).version;
@@ -40,7 +40,7 @@ function isSameAsPublished(registryVersions, options) {
   } else {
     return false;
   }
-};
+}
 
 function incrementVersionOfPackage(registryVersions, options) {
   const localPackageVersion = packageHandler.readPackageJson(path.join(options.cwd, 'package.json')).version;
@@ -50,7 +50,7 @@ function incrementVersionOfPackage(registryVersions, options) {
     execSync(`npm version --no-git-tag-version ${nextVersion}`, {cwd: options.cwd});
   }
   return nextVersion;
-};
+}
 
 function prepareForRelease(options) {
   options = options || {};

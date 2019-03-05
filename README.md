@@ -19,7 +19,7 @@ It also exports functions that can help write an alternative release logic if so
 * Ensure that you have a "test" script in your package.json. If you have nothing to do in this step, make it `":"`
 * Ensure that you have a "release" script in your package.json, and make
 this `"wnpm-release"` (the wnpm-release will be coming from this package, which you installed earlier)
-* Add a pom.xml, because currently CI does not work without a pom.xml.
+* For non protobuf modules: Add a pom.xml, because currently CI does not work without a pom.xml. (For protobuf modules, it's enough to only have `package.json`. Having both `package.json` and `pom.xml` will break!)  
 This requirement will be removed in the near future. See below for a minimal pom.xml
 * If your package is using dependencies from the Wix NPM repo, it should contain an `.npmrc` file at its root directory with the line `registry=http://npm.dev.wixpress.com/`.
 

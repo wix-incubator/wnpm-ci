@@ -61,15 +61,16 @@ function prepareForRelease(options) {
   options.cwd = options.cwd || process.cwd();
 
   const pkg = packageHandler.readPackageJson(path.join(options.cwd, 'package.json'));
-  if (process.env.DANGEROUSLY_FORCE_PKG_VERSION) {
-    console.log('Forcing verion', process.env.DANGEROUSLY_FORCE_PKG_VERSION);
-    writePackageVersion(process.env.DANGEROUSLY_FORCE_PKG_VERSION, options.cwd);
-    return;
-  }
 
   if (pkg.private) {
     console.log('No release because package is private');
   } else {
+    if (process.env.DANGEROUSLY_FORCE_PKG_VERSION) {
+      console.log('Forcing verion', process.env.DANGEROUSLY_FORCE_PKG_VERSION);
+      writePackageVersion(process.env.DANGEROUSLY_FORCE_PKG_VERSION, options.cwd);
+      return;
+    }
+    
     const registryVersions = findPublishedVersions(options.cwd);
     let currentPublishedVersion;
 

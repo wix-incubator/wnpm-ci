@@ -47,9 +47,13 @@ function incrementVersionOfPackage(registryVersions, options) {
   const nextVersion = versionCalculations.calculateNextVersionPackage(localPackageVersion, registryVersions, options);
 
   if (nextVersion !== localPackageVersion) {
-    execSync(`npm version --no-git-tag-version ${nextVersion}`, {cwd: options.cwd});
+    writePackageVersion(nextVersion, options.cwd);
   }
   return nextVersion;
+}
+
+function writePackageVersion(version, cwd) {
+  execSync(`npm version --no-git-tag-version ${version}`, {cwd});
 }
 
 function prepareForRelease(options) {
@@ -57,6 +61,12 @@ function prepareForRelease(options) {
   options.cwd = options.cwd || process.cwd();
 
   const pkg = packageHandler.readPackageJson(path.join(options.cwd, 'package.json'));
+  if (process.env.DANGEROUSLY_FORCE_PKG_VERSION) {
+    console.log('Forcing verion', process.env.DANGEROUSLY_FORCE_PKG_VERSION);
+    writePackageVersion(process.env.DANGEROUSLY_FORCE_PKG_VERSION, options.cwd);
+    return;
+  }
+
   if (pkg.private) {
     console.log('No release because package is private');
   } else {

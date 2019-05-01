@@ -66,7 +66,7 @@ function prepareForRelease(options) {
     console.log('No release because package is private');
   } else {
     if (process.env.DANGEROUSLY_FORCE_PKG_VERSION) {
-      console.log('Forcing verion', process.env.DANGEROUSLY_FORCE_PKG_VERSION);
+      console.log('Forcing package version', process.env.DANGEROUSLY_FORCE_PKG_VERSION);
       writePackageVersion(process.env.DANGEROUSLY_FORCE_PKG_VERSION, options.cwd);
       return;
     }

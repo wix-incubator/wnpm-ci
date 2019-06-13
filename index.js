@@ -4,23 +4,6 @@ const {compare} = require('./lib/version-comparator');
 const packageHandler = require('./lib/package-handler');
 const versionCalculations = require('./lib/version-calculations');
 
-// function getRegistryPackageInfo(cwd) {
-//   try {
-//     return JSON.parse(execSync('npm view --cache-min=0 --json', {cwd, stdio: 'pipe'}));
-//   } catch (e) {
-//     if (e.message.indexOf('npm ERR! code E404') >= 0) {
-//       return undefined;
-//     } else {
-//       throw e;
-//     }
-//   }
-// }
-
-// function findPublishedVersions(cwd) {
-//   const result = getRegistryPackageInfo(cwd);
-//   return normalizeVersions(result && result.versions);
-// }
-
 function maybeGetPackageInfo(pkgName, registryUrl) {
   try {
     return JSON.parse(execSync(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 --json ${pkgName}`, {stdio: 'pipe'}));

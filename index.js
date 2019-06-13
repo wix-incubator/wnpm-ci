@@ -17,13 +17,10 @@ function findPublishedVersionsOnAllRegistries(cwd) {
   const unscopedPackageName = pkg.name.replace('@wix/', '');
   const scopedPackageName = `@wix/${unscopedPackageName}`;
 
-  const npmjsRegistryUrl = 'https://registry.npmjs.org/';
-  const artifactoryRegistryUrl = 'https://npm.dev.wixpress.com/';
-
   const packagesInfo = [
-    maybeGetPackageInfo(unscopedPackageName, artifactoryRegistryUrl),
-    maybeGetPackageInfo(scopedPackageName, artifactoryRegistryUrl),
-    maybeGetPackageInfo(scopedPackageName, npmjsRegistryUrl),
+    maybeGetPackageInfo(unscopedPackageName, 'https://npm.dev.wixpress.com/'),
+    maybeGetPackageInfo(scopedPackageName, 'https://npm.dev.wixpress.com/'),
+    maybeGetPackageInfo(scopedPackageName, 'https://registry.npmjs.org/'),
   ].filter(pkgInfo => !!pkgInfo);
 
   const versions = packagesInfo.reduce((acc, pkgInfo) => {

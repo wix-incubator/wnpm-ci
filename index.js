@@ -4,21 +4,41 @@ const {compare} = require('./lib/version-comparator');
 const packageHandler = require('./lib/package-handler');
 const versionCalculations = require('./lib/version-calculations');
 
-function getRegistryPackageInfo(cwd) {
+function maybeGetPackageInfo(pkgName, registryUrl) {
   try {
-    return JSON.parse(execSync('npm view --cache-min=0 --json', {cwd, stdio: 'pipe'}));
+    return JSON.parse(execSync(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 --json ${pkgName}`, {stdio: 'pipe'}));
   } catch (e) {
-    if (e.message.indexOf('npm ERR! code E404') >= 0) {
-      return undefined;
-    } else {
-      throw e;
-    }
+    return null;
   }
 }
 
-function findPublishedVersions(cwd) {
-  const result = getRegistryPackageInfo(cwd);
-  return normalizeVersions(result && result.versions);
+function findPublishedVersionsOnAllRegistries(cwd) {
+  const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+  const unscopedPackageName = pkg.name.replace('@wix/', '');
+  const scopedPackageName = `@wix/${unscopedPackageName}`;
+
+  const packagesInfo = [
+    maybeGetPackageInfo(unscopedPackageName, 'https://npm.dev.wixpress.com/'),
+    maybeGetPackageInfo(scopedPackageName, 'https://npm.dev.wixpress.com/'),
+    maybeGetPackageInfo(scopedPackageName, 'https://registry.npmjs.org/'),
+  ].filter(pkgInfo => !!pkgInfo);
+
+  const versions = packagesInfo.reduce((acc, pkgInfo) => {
+    const pkgVersions = normalizeVersions(pkgInfo.versions);
+    return acc.concat(pkgVersions);
+  }, []);
+
+  const uniqueVersions = [...new Set(versions)];
+
+  // This is just to report stats from all registries
+  const currentPublishedVersion = versionCalculations.calculateCurrentPublished(pkg.version, uniqueVersions);
+  console.log(`currentPublishedVersion`, currentPublishedVersion);
+  packagesInfo.forEach(pkgInfo => {
+    const registry = pkgInfo.dist.tarball.split('/').slice(0,3).join('/');
+    console.log(`registry: ${registry} pkgName: ${pkgInfo.name} dist-tags: ${JSON.stringify(pkgInfo['dist-tags'])}`);
+  })
+
+  return uniqueVersions;
 }
 
 function normalizeVersions(versions) {
@@ -71,7 +91,7 @@ function prepareForRelease(options) {
       return;
     }
     
-    const registryVersions = findPublishedVersions(options.cwd);
+    const registryVersions = findPublishedVersionsOnAllRegistries(options.cwd);
     let currentPublishedVersion;
 
     try {
@@ -96,5 +116,5 @@ function prepareForRelease(options) {
 }
 
 module.exports = {
-  prepareForRelease
+  prepareForRelease,
 };

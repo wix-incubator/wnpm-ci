@@ -117,5 +117,4 @@ function prepareForRelease(options) {
 
 module.exports = {
   prepareForRelease,
-  findPublishedVersionsOnAllRegistries
 };

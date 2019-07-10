@@ -14,7 +14,7 @@ It also exports functions that can help write an alternative release logic if so
     * `publishConfig.registry` pointing to `http://npm.dev.wixpress.com/` or...
     * `publishConfig.registry` pointing to `https://registry.npmjs.org/` if you want to publish it to the public repository (for an open source npm module), or...
     * `private: true` if you don't want to publish the module
-* Run `npm install --save-dev @wix/wnpm-ci` to install this package
+* Run `npm install --save-dev wnpm-ci` to install this package
 * Ensure that you have a "build" script in your package.json. If you have nothing to do in this step, make it `":"`
 * Ensure that you have a "test" script in your package.json. If you have nothing to do in this step, make it `":"`
 * Ensure that you have a "release" script in your package.json, and make
@@ -37,7 +37,7 @@ This requirement will be removed in the near future. See below for a minimal pom
     "release": "wnpm-release # This will ensure that ci publishes the module"
   },
   "devDependencies": {
-    "@wix/wnpm-ci": "*"
+    "wnpm-ci": "*"
   }
 }
 ```

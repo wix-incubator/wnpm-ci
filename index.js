@@ -25,9 +25,9 @@ function findPublishedVersionsOnAllRegistries(cwd) {
   ];
   // if package is unscoped and public on npmjs
   if (pkg.publishConfig && pkg.publishConfig.registry === 'https://registry.npmjs.org/' && pkg.name === unscopedPackageName) {
-    packageInfo.push(maybeGetPackageInfo(unscopedPackageName, 'https://registry.npmjs.org/'))
+    packagesInfo.push(maybeGetPackageInfo(unscopedPackageName, 'https://registry.npmjs.org/'))
   }
-  packageInfo = packageInfo.filter(pkgInfo => !!pkgInfo);
+  packagesInfo = packagesInfo.filter(pkgInfo => !!pkgInfo);
 
   const versions = packagesInfo.reduce((acc, pkgInfo) => {
     const pkgVersions = normalizeVersions(pkgInfo.versions);
@@ -98,7 +98,7 @@ function prepareForRelease(options) {
       writePackageVersion(process.env.DANGEROUSLY_FORCE_PKG_VERSION, options.cwd);
       return;
     }
-    
+
     const registryVersions = findPublishedVersionsOnAllRegistries(options.cwd);
     let currentPublishedVersion;
 

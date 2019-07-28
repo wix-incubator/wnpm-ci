@@ -1,6 +1,6 @@
 {
   "name": "wnpm-ci",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "CI support scripts for npm packages",
   "main": "index.js",
   "publishConfig": {

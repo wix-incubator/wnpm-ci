@@ -33,6 +33,7 @@
     "mocha-env-reporter": "^4.0.0"
   },
   "dependencies": {
+    "execa": "^2.0.3",
     "mkdirp": "^0.5.1",
     "semver": "^5.2.0",
     "tmp": "0.0.33"

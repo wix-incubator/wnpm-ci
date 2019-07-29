@@ -1,5 +1,6 @@
 const path = require('path');
-const {exec, execSync} = require('child_process');
+const execa = require('execa');
+const {execSync} = require('child_process');
 const {compare} = require('./lib/version-comparator');
 const packageHandler = require('./lib/package-handler');
 const versionCalculations = require('./lib/version-calculations');
@@ -7,10 +8,8 @@ const writeGitHead = require('./lib/write-git-head');
 
 async function maybeGetPackageInfo(pkgName, registryUrl) {
   try {
-    const res = await new Promise((resolve, reject) => exec(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 --json ${pkgName}`, {stdio: 'pipe'}, (error, stdout, stderr) => {
-      error ? reject() : resolve(stdout)})
-    );
-    return JSON.parse(res);
+    const {stdout} = await execa(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 --json ${pkgName}`, {stdio: 'pipe', shell: true});
+    return JSON.parse(stdout);
   } catch (e) {
     return null;
   }

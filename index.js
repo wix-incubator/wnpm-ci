@@ -1,34 +1,33 @@
 const path = require('path');
+const execa = require('execa');
 const {execSync} = require('child_process');
 const {compare} = require('./lib/version-comparator');
 const packageHandler = require('./lib/package-handler');
 const versionCalculations = require('./lib/version-calculations');
 const writeGitHead = require('./lib/write-git-head');
 
-function maybeGetPackageInfo(pkgName, registryUrl) {
+async function maybeGetPackageInfo(pkgName, registryUrl) {
   try {
-    return JSON.parse(execSync(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 --json ${pkgName}`, {stdio: 'pipe'}));
+    const {stdout} = await execa(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 --json ${pkgName}`, {shell: true});
+    return JSON.parse(stdout);
   } catch (e) {
     return null;
   }
 }
 
-function findPublishedVersionsOnAllRegistries(cwd) {
+async function findPublishedVersionsOnAllRegistries(cwd) {
   const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
   const unscopedPackageName = pkg.name.replace('@wix/', '');
   const scopedPackageName = `@wix/${unscopedPackageName}`;
 
-  let packagesInfo = [
+  const packagesInfo = (await Promise.all([
     maybeGetPackageInfo(unscopedPackageName, 'https://npm.dev.wixpress.com/'),
     maybeGetPackageInfo(scopedPackageName, 'https://npm.dev.wixpress.com/'),
     maybeGetPackageInfo(scopedPackageName, 'https://registry.npmjs.org/'),
-  ];
-  // if package is unscoped and public on npmjs
-  if (pkg.publishConfig && pkg.publishConfig.registry === 'https://registry.npmjs.org/' && pkg.name === unscopedPackageName) {
-    packagesInfo.push(maybeGetPackageInfo(unscopedPackageName, 'https://registry.npmjs.org/'))
-  }
-  packagesInfo = packagesInfo.filter(pkgInfo => !!pkgInfo);
-
+    // if package is unscoped and public on npmjs
+    ...(pkg.publishConfig && pkg.publishConfig.registry === 'https://registry.npmjs.org/' && pkg.name === unscopedPackageName ? [maybeGetPackageInfo(unscopedPackageName, 'https://registry.npmjs.org/')] : [])
+  ])).filter(pkgInfo => !!pkgInfo);
+  
   const versions = packagesInfo.reduce((acc, pkgInfo) => {
     const pkgVersions = normalizeVersions(pkgInfo.versions);
     return acc.concat(pkgVersions);
@@ -82,7 +81,7 @@ function writePackageVersion(version, cwd) {
   execSync(`npm version --no-git-tag-version ${version}`, {cwd});
 }
 
-function prepareForRelease(options) {
+async function prepareForRelease(options) {
   options = options || {};
   options.cwd = options.cwd || process.cwd();
 
@@ -99,7 +98,7 @@ function prepareForRelease(options) {
       return;
     }
 
-    const registryVersions = findPublishedVersionsOnAllRegistries(options.cwd);
+    const registryVersions = await findPublishedVersionsOnAllRegistries(options.cwd);
     let currentPublishedVersion;
 
     try {

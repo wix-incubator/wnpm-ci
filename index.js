@@ -34,7 +34,7 @@ async function findPublishedVersionsOnAllRegistries(cwd) {
   }, []);
 
   const uniqueVersions = [...new Set(versions)];
-  
+
   // This is just to report stats from all registries
   const currentPublishedVersion = versionCalculations.calculateCurrentPublished(pkg.version, uniqueVersions);
   console.log(`currentPublishedVersion`, currentPublishedVersion);

@@ -24,7 +24,8 @@ async function findPublishedVersionsOnAllRegistries(cwd) {
     maybeGetPackageInfo(unscopedPackageName, 'https://npm.dev.wixpress.com/'),
     maybeGetPackageInfo(scopedPackageName, 'https://npm.dev.wixpress.com/'),
     maybeGetPackageInfo(scopedPackageName, 'https://registry.npmjs.org/'),
-    ...(pkg.publishConfig && pkg.publishConfig.registry === 'https://registry.npmjs.org/' && pkg.name === unscopedPackageName ? [maybeGetPackageInfo(unscopedPackageName, 'https://registry.npmjs.org/')] : []) //// if package is unscoped and public on npmjs
+    // if package is unscoped and public on npmjs
+    ...(pkg.publishConfig && pkg.publishConfig.registry === 'https://registry.npmjs.org/' && pkg.name === unscopedPackageName ? [maybeGetPackageInfo(unscopedPackageName, 'https://registry.npmjs.org/')] : [])
   ])).filter(pkgInfo => !!pkgInfo);
   
   const versions = packagesInfo.reduce((acc, pkgInfo) => {

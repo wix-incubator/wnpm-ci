@@ -8,7 +8,7 @@ const packageHandler = require('../lib/package-handler');
 
 describe('wnpm-release', () => {
   it('should not release a new version if same tarball is published', async () => {
-    latest = execSync('npm view . dist-tags.latest').toString().trim();
+    const latest = execSync('npm view . dist-tags.latest').toString().trim();
     const cwd = versionFetcher.fetch('wnpm-ci', latest);
     await prepareForRelease({cwd});
 

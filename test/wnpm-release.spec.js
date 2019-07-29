@@ -73,7 +73,7 @@ describe('wnpm-release', () => {
 });
 
 describe('wnpm-release cli', () => {
-  it('should bump patch by default', async () => {
+  it('should bump patch by default', () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
     execSync(path.resolve(__dirname, '../scripts/wnpm-release.js'), {cwd});
 
@@ -83,7 +83,7 @@ describe('wnpm-release cli', () => {
     expect(pkg.version).to.contain('6.2.');
   });
 
-  it('should bump minor', async () => {
+  it('should bump minor', () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
     execSync(path.resolve(__dirname, '../scripts/wnpm-release.js --bump-minor'), {cwd});
     const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));

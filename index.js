@@ -8,7 +8,7 @@ const writeGitHead = require('./lib/write-git-head');
 
 async function maybeGetPackageInfo(pkgName, registryUrl) {
   try {
-    const {stdout} = await execa(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 --json ${pkgName}`, {stdio: 'pipe', shell: true});
+    const {stdout} = await execa(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 --json ${pkgName}`, {shell: true});
     return JSON.parse(stdout);
   } catch (e) {
     return null;

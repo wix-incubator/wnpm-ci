@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const {expect} = require('chai');
-const {execSync, exec} = require('child_process');
+const {execSync} = require('child_process');
 const {prepareForRelease} = require('../index');
 const versionFetcher = require('../lib/version-fetcher');
 const packageHandler = require('../lib/package-handler');
@@ -75,7 +75,7 @@ describe('wnpm-release', () => {
 describe('wnpm-release cli', () => {
   it('should bump patch by default', async () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
-    await new Promise(res => exec(path.resolve(__dirname, '../scripts/wnpm-release.js'), {cwd}, res));
+    execSync(path.resolve(__dirname, '../scripts/wnpm-release.js'), {cwd});
 
     const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
@@ -85,7 +85,7 @@ describe('wnpm-release cli', () => {
 
   it('should bump minor', async () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
-    await new Promise(res => exec(path.resolve(__dirname, '../scripts/wnpm-release.js --bump-minor'), {cwd}, res));
+    execSync(path.resolve(__dirname, '../scripts/wnpm-release.js --bump-minor'), {cwd});
     const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.not.equal('6.2.0');

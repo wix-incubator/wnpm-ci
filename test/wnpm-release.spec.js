@@ -12,7 +12,7 @@ describe('wnpm-release', () => {
     const cwd = versionFetcher.fetch('wnpm-ci', latest);
     await prepareForRelease({cwd});
 
-    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(true);
     expect(pkg.version).to.equal(latest);
   });
@@ -21,7 +21,7 @@ describe('wnpm-release', () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
     await prepareForRelease({cwd});
 
-    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.not.equal('6.2.0');
     expect(pkg.version).to.contain('6.2.');
@@ -31,7 +31,7 @@ describe('wnpm-release', () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
     await prepareForRelease({cwd, shouldBumpMinor: true});
 
-    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.not.equal('6.2.0');
     expect(pkg.version).to.contain('6.3.');
@@ -42,18 +42,18 @@ describe('wnpm-release', () => {
     execSync(`npm version --no-git-tag-version 6.5.0`, {cwd});
     await prepareForRelease({cwd, shouldBumpMinor: true});
 
-    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.equal('6.5.0');
   });
 
   it('should support initial publish of new package', async () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
-    const json = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
-    packageHandler.writePackageJson(path.join(cwd, 'package.json'), {...json, name: 'wnpm-kukuriku'});
+    const json = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    await packageHandler.writePackageJson(path.join(cwd, 'package.json'), {...json, name: 'wnpm-kukuriku'});
     await prepareForRelease({cwd, shouldBumpMinor: true});
 
-    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.equal('6.2.0');
   });
@@ -65,7 +65,7 @@ describe('wnpm-release', () => {
     await prepareForRelease({cwd});
     versionFetcher.fetch = originalFetch;
 
-    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.not.equal('6.2.0');
     expect(pkg.version).to.contain('6.2.');
@@ -73,20 +73,20 @@ describe('wnpm-release', () => {
 });
 
 describe('wnpm-release cli', () => {
-  it('should bump patch by default', () => {
+  it('should bump patch by default', async () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
     execSync(path.resolve(__dirname, '../scripts/wnpm-release.js'), {cwd});
 
-    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.not.equal('6.2.0');
     expect(pkg.version).to.contain('6.2.');
   });
 
-  it('should bump minor', () => {
+  it('should bump minor', async () => {
     const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
     execSync(path.resolve(__dirname, '../scripts/wnpm-release.js --bump-minor'), {cwd});
-    const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+    const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);
     expect(pkg.version).to.not.equal('6.2.0');
     expect(pkg.version).to.contain('6.3.');

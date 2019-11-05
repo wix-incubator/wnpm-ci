@@ -1,6 +1,5 @@
 const path = require('path');
 const execa = require('execa');
-const {execSync} = require('child_process');
 const {compare} = require('./lib/version-comparator');
 const packageHandler = require('./lib/package-handler');
 const versionCalculations = require('./lib/version-calculations');
@@ -16,7 +15,7 @@ async function maybeGetPackageInfo(pkgName, registryUrl) {
 }
 
 async function findPublishedVersionsOnAllRegistries(cwd) {
-  const pkg = packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+  const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
   const unscopedPackageName = pkg.name.replace('@wix/', '');
   const scopedPackageName = `@wix/${unscopedPackageName}`;
 
@@ -56,36 +55,36 @@ function normalizeVersions(versions) {
   }
 }
 
-function isSameAsPublished(registryVersions, options) {
-  const localPackageVersion = packageHandler.readPackageJson(path.join(options.cwd, 'package.json')).version;
+async function isSameAsPublished(registryVersions, options) {
+  const localPackageVersion = (await packageHandler.readPackageJson(path.join(options.cwd, 'package.json'))).version;
   const currentPublishedVersion = versionCalculations.calculateCurrentPublished(localPackageVersion, registryVersions, options);
 
-  if (currentPublishedVersion && compare(options.cwd, currentPublishedVersion)) {
+  if (currentPublishedVersion && await compare(options.cwd, currentPublishedVersion)) {
     return currentPublishedVersion;
   } else {
     return false;
   }
 }
 
-function incrementVersionOfPackage(registryVersions, options) {
-  const localPackageVersion = packageHandler.readPackageJson(path.join(options.cwd, 'package.json')).version;
+async function incrementVersionOfPackage(registryVersions, options) {
+  const localPackageVersion = (await packageHandler.readPackageJson(path.join(options.cwd, 'package.json'))).version;
   const nextVersion = versionCalculations.calculateNextVersionPackage(localPackageVersion, registryVersions, options);
 
   if (nextVersion !== localPackageVersion) {
-    writePackageVersion(nextVersion, options.cwd);
+    await writePackageVersion(nextVersion, options.cwd);
   }
   return nextVersion;
 }
 
-function writePackageVersion(version, cwd) {
-  execSync(`npm version --no-git-tag-version ${version}`, {cwd});
+async function writePackageVersion(version, cwd) {
+  await execa(`npm version --no-git-tag-version ${version}`, {shell: true, cwd});
 }
 
 async function prepareForRelease(options) {
   options = options || {};
   options.cwd = options.cwd || process.cwd();
 
-  const pkg = packageHandler.readPackageJson(path.join(options.cwd, 'package.json'));
+  const pkg = await packageHandler.readPackageJson(path.join(options.cwd, 'package.json'));
 
   if (pkg.private) {
     console.log('No release because package is private');
@@ -94,7 +93,7 @@ async function prepareForRelease(options) {
 
     if (process.env.DANGEROUSLY_FORCE_PKG_VERSION && (!process.env.DANGEROUSLY_FORCE_PKG_NAME || process.env.DANGEROUSLY_FORCE_PKG_NAME === pkg.name)) {
       console.log(`Forcing package ${pkg.name} version ${process.env.DANGEROUSLY_FORCE_PKG_VERSION}`);
-      writePackageVersion(process.env.DANGEROUSLY_FORCE_PKG_VERSION, options.cwd);
+      await writePackageVersion(process.env.DANGEROUSLY_FORCE_PKG_VERSION, options.cwd);
       return;
     }
 
@@ -102,7 +101,7 @@ async function prepareForRelease(options) {
     let currentPublishedVersion;
 
     try {
-      currentPublishedVersion = isSameAsPublished(registryVersions, options);
+      currentPublishedVersion = await isSameAsPublished(registryVersions, options);
     }
     catch (err) {
       console.log("An error has occurred while comparing current version to published version:");
@@ -114,10 +113,10 @@ async function prepareForRelease(options) {
     if (currentPublishedVersion) {
       pkg.private = true;
       pkg.version = currentPublishedVersion;
-      packageHandler.writePackageJson(path.join(options.cwd, 'package.json'), pkg);
+      await packageHandler.writePackageJson(path.join(options.cwd, 'package.json'), pkg);
       console.log('No release because similar tarball is already published');
     } else {
-      incrementVersionOfPackage(registryVersions, options);
+      await incrementVersionOfPackage(registryVersions, options);
     }
   }
 }

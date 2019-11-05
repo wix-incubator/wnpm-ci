@@ -15,28 +15,28 @@ describe('package-handler', () => {
   });
   afterEach(() => process.chdir(pwd));
 
-  it('should read a package from path', () => {
+  it('should read a package from path', async () => {
     const fileName = path.join(dirName, 'package.json');
     const obj = {version: 123};
     fs.writeFileSync(fileName, JSON.stringify(obj));
-    expect(packageHandler.readPackageJson(fileName)).to.eql(obj);
+    expect(await packageHandler.readPackageJson(fileName)).to.eql(obj);
   });
 
-  it('should write a package to path', () => {
+  it('should write a package to path', async () => {
     const fileName = path.join(dirName, 'package.json');
-    packageHandler.writePackageJson(fileName, {});
+    await packageHandler.writePackageJson(fileName, {});
     expect(fs.readFileSync(fileName).toString()).to.be.equal(JSON.stringify({}));
   });
 
-  it('should read a package from relative path', () => {
+  it('should read a package from relative path', async () => {
     const obj = {version: 123};
     fs.writeFileSync(path.join(dirName, 'package.json'), JSON.stringify(obj));
     process.chdir(dirName);
-    expect(packageHandler.readPackageJson('package.json')).to.eql(obj);
+    expect(await packageHandler.readPackageJson('package.json')).to.eql(obj);
   });
 
-  it('should write a package to relative path', () => {
-    packageHandler.writePackageJson(path.join(dirName, 'package.json'), {});
+  it('should write a package to relative path', async () => {
+    await packageHandler.writePackageJson(path.join(dirName, 'package.json'), {});
     process.chdir(dirName);
     expect(fs.readFileSync('package.json').toString()).to.be.equal(JSON.stringify({}));
   });

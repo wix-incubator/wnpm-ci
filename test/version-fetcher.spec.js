@@ -9,15 +9,15 @@ use(chaiAsPromised);
 
 describe('version-fetcher', () => {
   it('should retrieve the version from npm and pack it', async () => {
-    const dirName = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const dirName = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     const pkg = await packageHandler.readPackageJson(path.join(dirName, 'package.json'));
     expect(pkg.name).to.equal('wnpm-ci');
     expect(pkg.version).to.equal('6.2.0');
   });
 
   it('should pack current package', async () => {
-    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
-    const dirName = versionFetcher.cloneAndPack(cwd);
+    const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const dirName = await versionFetcher.cloneAndPack(cwd);
     const pkg = await packageHandler.readPackageJson(path.join(dirName, 'package.json'));
     expect(pkg.name).to.equal('wnpm-ci');
     expect(pkg.version).to.equal('6.2.0');
@@ -49,11 +49,9 @@ describe('version-fetcher', () => {
     await versionFetcher.copyVersion('/a', '/b', 'kaki.json');
   });
 
-  it('should propagate errors in fetch', () => {
-    expect(() => versionFetcher.fetch('wnpm-ci', '0.0.1')).to.throw();
-  });
+  it('should propagate errors in fetch', () =>
+    expect(versionFetcher.fetch('wnpm-ci', '0.0.1')).to.be.rejected);
 
-  it('should propagate errors in cloneAndPack', () => {
-    expect(() => versionFetcher.cloneAndPack('/no-such-dir')).to.throw();
-  });
+  it('should propagate errors in cloneAndPack', () =>
+    expect(versionFetcher.cloneAndPack('/no-such-dir')).to.be.rejected);
 });

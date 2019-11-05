@@ -23,40 +23,40 @@ describe('write-git-head', () => {
     process.env.BUILD_VCS_NUMBER = INITIAL_BUILD_VCS_NUMBER;
   });
 
-  it('should create .git dir and write a git HEAD if BUILD_VCS_NUMBER exists', () => {
+  it('should create .git dir and write a git HEAD if BUILD_VCS_NUMBER exists', async () => {
     const headFile = path.join(dirName, '.git/HEAD');
-    writeGitHead(dirName);
+    await writeGitHead(dirName);
 
     expect(fs.existsSync(headFile));
     expect(fs.readFileSync(headFile, 'utf-8')).to.be.equal(commitSha);
   });
 
-  it('should write a git HEAD to .git if BUILD_VCS_NUMBER exists', () => {
+  it('should write a git HEAD to .git if BUILD_VCS_NUMBER exists', async () => {
     const gitDirname = path.join(dirName, '.git');
     const headFile = path.join(gitDirname, 'HEAD');
     mkdirp.sync(gitDirname)
-    writeGitHead(dirName);
+    await writeGitHead(dirName);
 
     expect(fs.existsSync(headFile));
     expect(fs.readFileSync(headFile, 'utf-8')).to.be.equal(commitSha);
   });
 
-  it('should not write a git HEAD if .git/HEAD exists', () => {
+  it('should not write a git HEAD if .git/HEAD exists', async () => {
     const gitDirname = path.join(dirName, '.git');
     const headFile = path.join(gitDirname, 'HEAD');
     const existedSha = '1bfbkw47c3feaae5u3s2100oi2575fee1ba01f8w'
     mkdirp.sync(gitDirname)
     fs.writeFileSync(headFile, existedSha, {encoding: 'utf-8'});
-    writeGitHead(dirName);
+    await writeGitHead(dirName);
 
     expect(fs.existsSync(headFile));
     expect(fs.readFileSync(headFile, 'utf-8')).to.be.equal(existedSha);
   });
 
-  it('should not write a git HEAD if BUILD_VCS_NUMBER doesn\'t exist', () => {
+  it('should not write a git HEAD if BUILD_VCS_NUMBER doesn\'t exist', async () => {
     const headFile = path.join(dirName, '.git/HEAD');
     delete process.env.BUILD_VCS_NUMBER;
-    writeGitHead(dirName);
+    await writeGitHead(dirName);
 
     expect(fs.existsSync(headFile) === false);
   });

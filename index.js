@@ -89,7 +89,7 @@ async function prepareForRelease(options) {
   if (pkg.private) {
     console.log('No release because package is private');
   } else {
-    writeGitHead(options.cwd);
+    await writeGitHead(options.cwd);
 
     if (process.env.DANGEROUSLY_FORCE_PKG_VERSION && (!process.env.DANGEROUSLY_FORCE_PKG_NAME || process.env.DANGEROUSLY_FORCE_PKG_NAME === pkg.name)) {
       console.log(`Forcing package ${pkg.name} version ${process.env.DANGEROUSLY_FORCE_PKG_VERSION}`);

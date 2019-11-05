@@ -9,7 +9,7 @@ const packageHandler = require('../lib/package-handler');
 describe('wnpm-release', () => {
   it('should not release a new version if same tarball is published', async () => {
     const latest = execSync('npm view . dist-tags.latest').toString().trim();
-    const cwd = versionFetcher.fetch('wnpm-ci', latest);
+    const cwd = await versionFetcher.fetch('wnpm-ci', latest);
     await prepareForRelease({cwd});
 
     const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
@@ -18,7 +18,7 @@ describe('wnpm-release', () => {
   });
 
   it('should bump patch by default', async () => {
-    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     await prepareForRelease({cwd});
 
     const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
@@ -28,7 +28,7 @@ describe('wnpm-release', () => {
   });
 
   it('should bump minor', async () => {
-    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     await prepareForRelease({cwd, shouldBumpMinor: true});
 
     const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
@@ -38,7 +38,7 @@ describe('wnpm-release', () => {
   });
 
   it('should not touch version if it was modifier manually', async () => {
-    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     execSync(`npm version --no-git-tag-version 6.5.0`, {cwd});
     await prepareForRelease({cwd, shouldBumpMinor: true});
 
@@ -48,7 +48,7 @@ describe('wnpm-release', () => {
   });
 
   it('should support initial publish of new package', async () => {
-    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     const json = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     await packageHandler.writePackageJson(path.join(cwd, 'package.json'), {...json, name: 'wnpm-kukuriku'});
     await prepareForRelease({cwd, shouldBumpMinor: true});
@@ -59,9 +59,9 @@ describe('wnpm-release', () => {
   });
 
   it('should bump version if comparing to published version fails', async () => {
-    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     const originalFetch = versionFetcher.fetch;
-    versionFetcher.fetch = () => { throw new Error("Failed!")};
+    versionFetcher.fetch = () => Promise.reject(new Error("Failed!"));
     await prepareForRelease({cwd});
     versionFetcher.fetch = originalFetch;
 
@@ -74,7 +74,7 @@ describe('wnpm-release', () => {
 
 describe('wnpm-release cli', () => {
   it('should bump patch by default', async () => {
-    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     execSync(path.resolve(__dirname, '../scripts/wnpm-release.js'), {cwd});
 
     const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
@@ -84,7 +84,7 @@ describe('wnpm-release cli', () => {
   });
 
   it('should bump minor', async () => {
-    const cwd = versionFetcher.fetch('wnpm-ci', '6.2.0');
+    const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     execSync(path.resolve(__dirname, '../scripts/wnpm-release.js --bump-minor'), {cwd});
     const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
     expect(pkg.private).to.equal(undefined);

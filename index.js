@@ -14,18 +14,26 @@ async function maybeGetPackageInfo(pkgName, registryUrl) {
   }
 }
 
-async function findPublishedVersionsOnAllRegistries(cwd) {
+async function findPublishedVersionsOnAllRegistries(cwd, registries) {
   const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
   const unscopedPackageName = pkg.name.replace('@wix/', '');
   const scopedPackageName = `@wix/${unscopedPackageName}`;
 
-  const packagesInfo = (await Promise.all([
-    maybeGetPackageInfo(unscopedPackageName, 'https://npm.dev.wixpress.com/'),
-    maybeGetPackageInfo(scopedPackageName, 'https://npm.dev.wixpress.com/'),
-    maybeGetPackageInfo(scopedPackageName, 'https://registry.npmjs.org/'),
-    // if package is unscoped and public on npmjs
-    ...(pkg.publishConfig && pkg.publishConfig.registry === 'https://registry.npmjs.org/' && pkg.name === unscopedPackageName ? [maybeGetPackageInfo(unscopedPackageName, 'https://registry.npmjs.org/')] : [])
-  ])).filter(pkgInfo => !!pkgInfo);
+  if (!registries) {
+    registries = ['https://npm.dev.wixpress.com/', 'https://registry.npmjs.org/'];
+  }
+
+  let packageInfoPromises = [];
+  for (const registry of registries) {
+    packageInfoPromises.push(maybeGetPackageInfo(scopedPackageName, registry));
+
+    if (!registry.includes('registry.npmjs.org') ||
+      (pkg.publishConfig && pkg.publishConfig.registry === 'https://registry.npmjs.org/')) {
+        packageInfoPromises.push(maybeGetPackageInfo(unscopedPackageName, registry));
+    }
+  }
+
+  const packagesInfo = (await Promise.all(packageInfoPromises)).filter(pkgInfo => !!pkgInfo);
   
   const versions = packagesInfo.reduce((acc, pkgInfo) => {
     const pkgVersions = normalizeVersions(pkgInfo.versions);
@@ -97,7 +105,7 @@ async function prepareForRelease(options) {
       return;
     }
 
-    const registryVersions = await findPublishedVersionsOnAllRegistries(options.cwd);
+    const registryVersions = await findPublishedVersionsOnAllRegistries(options.cwd, options.registries);
     let currentPublishedVersion;
 
     try {

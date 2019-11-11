@@ -1,12 +1,13 @@
-const fs = require('fs');
 const path = require('path');
 const {expect} = require('chai');
 const {execSync} = require('child_process');
 const {prepareForRelease} = require('../index');
 const versionFetcher = require('../lib/version-fetcher');
 const packageHandler = require('../lib/package-handler');
+const {aRegistryDriver} = require('./drivers/registry');
 
 describe('wnpm-release', () => {
+
   it('should not release a new version if same tarball is published', async () => {
     const latest = execSync('npm view . dist-tags.latest').toString().trim();
     const cwd = await versionFetcher.fetch('wnpm-ci', latest);
@@ -70,6 +71,29 @@ describe('wnpm-release', () => {
     expect(pkg.version).to.not.equal('6.2.0');
     expect(pkg.version).to.contain('6.2.');
   });
+
+  describe('with custom registry', () => {
+    let registry = aRegistryDriver();
+
+    before(() =>
+      registry.start());
+
+    after(() =>
+      registry.stop());
+
+    it('should use a different set of registries if passed, when fetching version for bump', async () => {
+      const packageName = `cool-npm-package`;
+      const [olderVersion, mostRecentVersion, nextVersion] = ['4.5.23', '4.5.24', '4.5.25'];
+      await registry.putPackageInRegistry({ packageName, version: olderVersion });
+      await registry.putPackageInRegistry({ packageName, version: mostRecentVersion });
+
+      const cwd = await registry.fetchPackage({ packageName, version: olderVersion });
+      await prepareForRelease({ cwd, registries: [registry.getRegistryUrl()] });
+  
+      const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+      expect(pkg.version).to.equal(nextVersion);
+    });
+  })
 });
 
 describe('wnpm-release cli', () => {

@@ -131,4 +131,5 @@ async function prepareForRelease(options) {
 
 module.exports = {
   prepareForRelease,
+  writeGitHead,
 };

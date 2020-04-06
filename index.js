@@ -124,6 +124,7 @@ async function prepareForRelease(options) {
       await packageHandler.writePackageJson(path.join(options.cwd, 'package.json'), pkg);
       console.log('No release because similar tarball is already published');
     } else {
+      console.log('A difference exists from the published package. Incrementing version...')
       await incrementVersionOfPackage(registryVersions, options);
     }
   }

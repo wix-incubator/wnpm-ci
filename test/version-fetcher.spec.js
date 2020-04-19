@@ -33,8 +33,10 @@ describe('version-fetcher', () => {
     const localVersion = 'local version';
     const remoteGitHead = 'a';
     const remotePublishConfig = 'b';
+    const remoteBuildTime = 10;
+    const remoteSha = 'sha';
 
-    await packageHandler.writePackageJson(remoteFile, {version: remoteVersion, gitHead: remoteGitHead, publishConfig: remotePublishConfig});
+    await packageHandler.writePackageJson(remoteFile, {version: remoteVersion, gitHead: remoteGitHead, publishConfig: remotePublishConfig, 'build-time': remoteBuildTime, sha: remoteSha});
     await packageHandler.writePackageJson(localFile, {version: localVersion});
 
     await versionFetcher.copyVersion(remotePath, localPath, 'kaki.json', x => Object.assign(x, {abc: 123}));
@@ -47,6 +49,8 @@ describe('version-fetcher', () => {
     expect(localPkg.abc).to.eql(123);
     expect(localPkg.gitHead).to.eql(remoteGitHead);
     expect(localPkg.publishConfig).to.deep.eql(remotePublishConfig);
+    expect(localPkg['build-time']).to.deep.eql(remoteBuildTime);
+    expect(localPkg.sha).to.deep.eql(remoteSha);
   });
 
   it('should ignore exceptions when copying versions', async () => {

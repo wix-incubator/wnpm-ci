@@ -47,7 +47,7 @@ async function findPublishedVersionsOnAllRegistries(cwd, registries) {
   console.log(`currentPublishedVersion`, currentPublishedVersion);
   packagesInfo.forEach(pkgInfo => {
     const registry = pkgInfo.dist.tarball.split('/').slice(0,3).join('/');
-    console.log(`registry: ${registry} pkgName: ${pkgInfo.name} dist-tags: ${JSON.stringify(pkgInfo['dist-tags'])}`);
+    console.log(`registry: ${registry} pkgName: ${pkgInfo.name}`);
   })
 
   return uniqueVersions;

@@ -1,6 +1,6 @@
 const path = require('path');
 const execa = require('execa');
-const {compare} = require('./lib/version-comparator');
+const {compare, compareVersions} = require('./lib/version-comparator');
 const packageHandler = require('./lib/package-handler');
 const versionCalculations = require('./lib/version-calculations');
 const writeGitHead = require('./lib/write-git-head');
@@ -67,10 +67,22 @@ async function isSameAsPublished(registryVersions, options) {
   const localPackageVersion = (await packageHandler.readPackageJson(path.join(options.cwd, 'package.json'))).version;
   const currentPublishedVersion = versionCalculations.calculateCurrentPublished(localPackageVersion, registryVersions, options);
 
-  if (currentPublishedVersion && await compare(options.cwd, currentPublishedVersion)) {
-    return currentPublishedVersion;
-  } else {
+  if (!currentPublishedVersion) {
     return false;
+  }
+
+  let isSame = false;
+
+  if (options.versionToCompare) {
+    isSame = await compareVersions(options.cwd, options.versionToCompare, currentPublishedVersion)
+  } else {
+    isSame = await compare(options.cwd, currentPublishedVersion)
+  }
+
+  if (isSame) {
+    return currentPublishedVersion
+  } else {
+    return false
   }
 }
 

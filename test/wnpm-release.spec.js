@@ -72,6 +72,25 @@ describe('wnpm-release', () => {
     expect(pkg.version).to.contain('6.2.');
   });
 
+  describe('with comparing to a published version (with http url)', () => {
+    it('should not bump a version when comparing lastest to the matching version', async () => {
+      const cwd = await versionFetcher.fetch('tmp.xsb6m4j2', '1.0.0');
+      await prepareForRelease({ cwd, versionToCompare: 'https://registry.npmjs.org/tmp.xsb6m4j2/-/tmp.xsb6m4j2-1.0.0-same.tgz'});
+  
+      const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+      expect(pkg.private).to.equal(true);
+    })
+
+    it('should bump a version when comparing lastest to a non matching version', async () => {
+      const cwd = await versionFetcher.fetch('tmp.xsb6m4j2', '1.0.0');
+      await prepareForRelease({ cwd, versionToCompare: 'https://registry.npmjs.org/tmp.xsb6m4j2/-/tmp.xsb6m4j2-1.0.0-not-same.tgz'});
+  
+      const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+      expect(pkg.private).to.equal(undefined);
+      expect(pkg.version).to.equal('1.0.1')
+    })
+  })
+
   describe('with custom registry', () => {
     let registry = aRegistryDriver();
 

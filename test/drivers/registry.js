@@ -28,11 +28,12 @@ module.exports.aRegistryDriver = ({ port = 4873 } = {}) => {
     return `http://localhost:${port}`;
   };
 
-  const putPackageInRegistry = async ({ packageName, version }) => {
+  const putPackageInRegistry = async ({ packageName, version, checksum }) => {
     const dir = tmp.dirSync({ unsafeCleanup: true });
     const packageJson = {
       name: packageName,
       version,
+      checksum,
       public: true
     }
     const npmRc = `//localhost:${port}/:_authToken=cm95IHNvbW1lciB3YXMgaGVyZQ==\n`;

@@ -76,7 +76,7 @@ describe('wnpm-release', () => {
     it('should not bump a version when comparing lastest to the matching version', async () => {
       const cwd = await versionFetcher.fetch('tmp.xsb6m4j2', '1.0.0');
       await prepareForRelease({ cwd, versionToCompare: 'https://registry.npmjs.org/tmp.xsb6m4j2/-/tmp.xsb6m4j2-1.0.0-same.tgz'});
-  
+
       const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
       expect(pkg.private).to.equal(true);
     })
@@ -84,7 +84,7 @@ describe('wnpm-release', () => {
     it('should bump a version when comparing lastest to a non matching version', async () => {
       const cwd = await versionFetcher.fetch('tmp.xsb6m4j2', '1.0.0');
       await prepareForRelease({ cwd, versionToCompare: 'https://registry.npmjs.org/tmp.xsb6m4j2/-/tmp.xsb6m4j2-1.0.0-not-same.tgz'});
-  
+
       const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
       expect(pkg.private).to.equal(undefined);
       expect(pkg.version).to.equal('1.0.1')
@@ -108,11 +108,44 @@ describe('wnpm-release', () => {
 
       const cwd = await registry.fetchPackage({ packageName, version: olderVersion });
       await prepareForRelease({ cwd, registries: [registry.getRegistryUrl()] });
-  
+
       const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
       expect(pkg.version).to.equal(nextVersion);
     });
-  })
+  });
+
+  describe('with checkHashInPackageJson', function () {
+    this.timeout(5000);
+    const registry = aRegistryDriver();
+    const packageName = 'cool-npm-package';
+    const [olderVersion, mostRecentVersion, nextVersion] = ['4.5.23', '4.5.24', '4.5.25'];
+
+    beforeEach(() => registry.start());
+
+    afterEach(() => registry.stop());
+
+    it('should bump on diffrent checksum', async () => {
+      await registry.putPackageInRegistry({ packageName, version: olderVersion, checksum: 'a' });
+      await registry.putPackageInRegistry({ packageName, version: mostRecentVersion, checksum: 'b' });
+
+      const cwd = await registry.fetchPackage({ packageName, version: olderVersion });
+      await prepareForRelease({ cwd, registries: [registry.getRegistryUrl()] , checkHashInPackageJson: true});
+
+      const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+      expect(pkg.version).to.equal(nextVersion);
+    });
+
+    it('should not publish on same checksum', async () => {
+      await registry.putPackageInRegistry({ packageName, version: olderVersion, checksum: 'a' });
+      await registry.putPackageInRegistry({ packageName, version: mostRecentVersion, checksum: 'a' });
+
+      const cwd = await registry.fetchPackage({ packageName, version: olderVersion });
+      await prepareForRelease({ cwd, registries: [registry.getRegistryUrl()] , checkHashInPackageJson: true});
+
+      const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
+      expect(pkg.version).to.equal(mostRecentVersion);
+    });
+  });
 });
 
 describe('wnpm-release cli', () => {

@@ -63,9 +63,25 @@ function normalizeVersions(versions) {
   }
 }
 
+const getChecksum = async (registryUrl, pkgName, version) => {
+  const {stdout} = await execa(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 ${pkgName}@${version} checksum`, {shell: true});
+  return stdout;
+}
+
+async function isSameHashAsPublished(pkgName, localVersion, currentPublishedVersion) {
+  const registryUrl = 'https://npm.dev.wixpress.com/';
+  const versions = [localVersion, currentPublishedVersion];
+  const [checksum1, checksum2] = await Promise.all(versions.map(v => getChecksum(registryUrl, pkgName, v)));
+  return checksum1 === checksum2;
+}
+
 async function isSameAsPublished(registryVersions, options) {
-  const localPackageVersion = (await packageHandler.readPackageJson(path.join(options.cwd, 'package.json'))).version;
+  const pkg = await packageHandler.readPackageJson(path.join(options.cwd, 'package.json'))
+  const localPackageVersion = pkg.version;
   const currentPublishedVersion = versionCalculations.calculateCurrentPublished(localPackageVersion, registryVersions, options);
+  if (options.checkHashInPackageJson) {
+    return isSameHashAsPublished(pkg.name, localPackageVersion, currentPublishedVersion)
+  }
 
   if (!currentPublishedVersion) {
     return false;
@@ -100,8 +116,11 @@ async function writePackageVersion(version, cwd) {
   await execa(`npm version --no-git-tag-version ${version}`, {shell: true, cwd});
 }
 
-async function prepareForRelease(options) {
-  options = options || {};
+/**
+ * @param {{shouldBumpMinor?:boolean, checkHashInPackageJson?:boolean, cwd?:string, registries?:string[]}} [options]
+ * @returns {Promise<void>}
+ */
+async function prepareForRelease(options = {}) {
   options.cwd = options.cwd || process.cwd();
 
   const pkg = await packageHandler.readPackageJson(path.join(options.cwd, 'package.json'));

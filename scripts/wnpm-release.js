@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-const shouldBumpMinor = process.argv.indexOf("--bump-minor") >= 0;
+const hasArg = n => process.argv.indexOf(n) >= 0;
+const shouldBumpMinor = hasArg("--bump-minor");
+const checkHashInPackageJson = hasArg("--check-hash");
 
 (async () => {
-    await require('../index').prepareForRelease({shouldBumpMinor: shouldBumpMinor});
+    await require('../index').prepareForRelease({shouldBumpMinor, checkHashInPackageJson});
 })()

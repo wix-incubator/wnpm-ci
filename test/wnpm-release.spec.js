@@ -40,7 +40,7 @@ describe('wnpm-release', () => {
 
   it('should not touch version if it was modifier manually', async () => {
     const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
-    execSync(`npm version --no-git-tag-version 6.5.0`, {cwd});
+    execSync('npm version --no-git-tag-version 6.5.0', {cwd});
     await prepareForRelease({cwd, shouldBumpMinor: true});
 
     const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
@@ -62,7 +62,7 @@ describe('wnpm-release', () => {
   it('should bump version if comparing to published version fails', async () => {
     const cwd = await versionFetcher.fetch('wnpm-ci', '6.2.0');
     const originalFetch = versionFetcher.fetch;
-    versionFetcher.fetch = () => Promise.reject(new Error("Failed!"));
+    versionFetcher.fetch = () => Promise.reject(new Error('Failed!'));
     await prepareForRelease({cwd});
     versionFetcher.fetch = originalFetch;
 
@@ -79,7 +79,7 @@ describe('wnpm-release', () => {
 
       const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
       expect(pkg.private).to.equal(true);
-    })
+    });
 
     it('should bump a version when comparing lastest to a non matching version', async () => {
       const cwd = await versionFetcher.fetch('tmp.xsb6m4j2', '1.0.0');
@@ -87,12 +87,12 @@ describe('wnpm-release', () => {
 
       const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'));
       expect(pkg.private).to.equal(undefined);
-      expect(pkg.version).to.equal('1.0.1')
-    })
-  })
+      expect(pkg.version).to.equal('1.0.1');
+    });
+  });
 
   describe('with custom registry', () => {
-    let registry = aRegistryDriver();
+    const registry = aRegistryDriver();
 
     before(() =>
       registry.start());
@@ -101,7 +101,7 @@ describe('wnpm-release', () => {
       registry.stop());
 
     it('should use a different set of registries if passed, when fetching version for bump', async () => {
-      const packageName = `cool-npm-package`;
+      const packageName = 'cool-npm-package';
       const [olderVersion, mostRecentVersion, nextVersion] = ['4.5.23', '4.5.24', '4.5.25'];
       await registry.putPackageInRegistry({ packageName, version: olderVersion });
       await registry.putPackageInRegistry({ packageName, version: mostRecentVersion });

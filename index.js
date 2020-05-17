@@ -63,24 +63,10 @@ function normalizeVersions(versions) {
   }
 }
 
-const getChecksum = async (registryUrl, pkgName, version) => {
-  const {stdout} = await execa(`npm view --registry=${registryUrl} --@wix:registry=${registryUrl} --cache-min=0 ${pkgName}@${version} checksum`, {shell: true});
-  return stdout;
-};
-
-async function isSameHashAsPublished(pkgName, localVersion, currentPublishedVersion, registryUrl) {
-  const versions = [localVersion, currentPublishedVersion];
-  const [checksum1, checksum2] = await Promise.all(versions.map(v => getChecksum(registryUrl, pkgName, v)));
-  return checksum1 === checksum2 ? currentPublishedVersion : false;
-}
-
 async function isSameAsPublished(registryVersions, options) {
   const pkg = await packageHandler.readPackageJson(path.join(options.cwd, 'package.json'));
   const localPackageVersion = pkg.version;
   const currentPublishedVersion = versionCalculations.calculateCurrentPublished(localPackageVersion, registryVersions, options);
-  if (options.checkHashInPackageJson) {
-    return await isSameHashAsPublished(pkg.name, localPackageVersion, currentPublishedVersion, options.registries[0]);
-  }
 
   if (!currentPublishedVersion) {
     return false;
@@ -89,9 +75,9 @@ async function isSameAsPublished(registryVersions, options) {
   let isSame = false;
 
   if (options.versionToCompare) {
-    isSame = await compareVersions(options.cwd, options.versionToCompare, currentPublishedVersion);
+    isSame = await compareVersions(options.cwd, options.versionToCompare, currentPublishedVersion, options);
   } else {
-    isSame = await compare(options.cwd, currentPublishedVersion);
+    isSame = await compare(options.cwd, currentPublishedVersion, options);
   }
 
   if (isSame) {

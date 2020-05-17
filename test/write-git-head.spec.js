@@ -1,4 +1,4 @@
-"use script"
+'use script'
 
 const fs = require('fs')
 const tmp = require('tmp')

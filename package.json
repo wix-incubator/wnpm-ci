@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": ":",
-    "test": "mocha --reporter mocha-env-reporter --timeout 60000",
+    "test": "eslint . --cache && mocha --reporter mocha-env-reporter --timeout 60000",
     "release": "./scripts/wnpm-release.js --no-shrinkwrap"
   },
   "keywords": [

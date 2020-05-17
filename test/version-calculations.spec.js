@@ -36,11 +36,11 @@ describe('version-calculations', function () {
       assert.equal('1.1.3', versionCalc.calculateNextVersionPackage('1.1.2', publishedVersionsToTest))
     })
 
-    it("should retain prerelease part when incrementing", function () {
+    it('should retain prerelease part when incrementing', function () {
       assert.equal('1.1.3-a.a', versionCalc.calculateNextVersionPackage('1.1.2-a.a', publishedVersionsToTest))
     })
 
-    it("should return itself when no published versions", function () {
+    it('should return itself when no published versions', function () {
       assert.equal('1.1.3', versionCalc.calculateNextVersionPackage('1.1.3', []))
     })
   })
@@ -95,11 +95,11 @@ describe('version-calculations', function () {
       assert.equal('1.2.2', versionCalc.calculateNextVersionPackage('1.1.2', publishedVersionsToTest, {shouldBumpMinor: true}))
     })
 
-    it("should return a minor version increment for 0.x versions", function () {
+    it('should return a minor version increment for 0.x versions', function () {
       assert.equal('0.3.0', versionCalc.calculateNextVersionPackage('0.1.0', publishedVersionsToTest, {shouldBumpMinor: true}))
     })
 
-    it("should return itself when no published versions", function () {
+    it('should return itself when no published versions', function () {
       assert.equal('1.1.3', versionCalc.calculateNextVersionPackage('1.1.3', [], {shouldBumpMinor: true}))
     })
   })

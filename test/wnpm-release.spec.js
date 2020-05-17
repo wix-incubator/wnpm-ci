@@ -137,7 +137,7 @@ describe('wnpm-release', () => {
 
     it('should not publish on same checksum local', async () => {
       await registry.putPackageInRegistry({ packageName, version: olderVersion, checksum: 'a' });
-      await registry.putPackageInRegistry({ packageName, version: mostRecentVersion, checksum: 'JeOjslySNLU0E7SyBqzFriv27aY=' });
+      await registry.putPackageInRegistry({ packageName, version: mostRecentVersion, checksum: 'a' });
 
       const cwd = await registry.fetchPackage({ packageName, version: olderVersion });
       await prepareForRelease({ cwd, registries: [registry.getRegistryUrl()] , checkHashInPackageJson: true});

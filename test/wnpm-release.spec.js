@@ -5,6 +5,7 @@ const {prepareForRelease} = require('../index')
 const versionFetcher = require('../lib/version-fetcher')
 const packageHandler = require('../lib/package-handler')
 const {aRegistryDriver} = require('./drivers/registry')
+const { writeFile } = require('fs-extra')
 
 describe('wnpm-release', () => {
 
@@ -88,6 +89,20 @@ describe('wnpm-release', () => {
       const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'))
       expect(pkg.private).to.equal(undefined)
       expect(pkg.version).to.equal('1.0.1')
+    })
+
+    describe('with preCompareEdits', () => {
+      it('should not bump a version when edits make the content the same', async () => {
+        const cwd = await versionFetcher.fetch('tmp.xsb6m4j2', '1.0.0')
+        await prepareForRelease({
+          cwd, versionToCompare: 'https://registry.npmjs.org/tmp.xsb6m4j2/-/tmp.xsb6m4j2-1.0.0-not-same.tgz', preCompareEdits: async (pathA, pathB) => {
+            await writeFile(path.join(pathA, 'aTestForWnpmCI'), '5')
+            await writeFile(path.join(pathB, 'aTestForWnpmCI'), '5')
+          }})
+
+        const pkg = await packageHandler.readPackageJson(path.join(cwd, 'package.json'))
+        expect(pkg.private).to.equal(true)
+      })
     })
   })
 

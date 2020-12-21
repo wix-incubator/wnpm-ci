@@ -88,11 +88,11 @@ describe('version-calculations', function () {
     })
 
     it("should return a minor version increment when it's the same as the latest version of the latest 'branch'", function () {
-      assert.equal('5.5.3', versionCalc.calculateNextVersionPackage('5.4.3', publishedVersionsToTest, {shouldBumpMinor: true}))
+      assert.equal('5.5.0', versionCalc.calculateNextVersionPackage('5.4.3', publishedVersionsToTest, {shouldBumpMinor: true}))
     })
 
     it("should return a minor version increment when it's the same as the latest version of the previous 'branch'", function () {
-      assert.equal('1.2.2', versionCalc.calculateNextVersionPackage('1.1.2', publishedVersionsToTest, {shouldBumpMinor: true}))
+      assert.equal('1.2.0', versionCalc.calculateNextVersionPackage('1.1.2', publishedVersionsToTest, {shouldBumpMinor: true}))
     })
 
     it('should return a minor version increment for 0.x versions', function () {

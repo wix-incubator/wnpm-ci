@@ -39,7 +39,7 @@
   "dependencies": {
     "execa": "^2.0.3",
     "fs-extra": "^8.1.0",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.0",
     "semver": "^5.2.0",
     "tmp": "^0.0.33"
   }
